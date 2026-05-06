@@ -242,6 +242,7 @@ def basicerror(
         linestyle=linestyle,
         alpha=alpha,
         marker=marker,
+        zorder=3,
         label=title if title else None,
         ecolor=ecolor if ecolor else color,
         elinewidth=elinewidth,
