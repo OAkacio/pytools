@@ -452,6 +452,221 @@ def multi(
     return None
 
 
+def multierror(
+    x_list,
+    y_list,
+    x_err_list=None,
+    y_err_list=None,
+    curve_names=None,
+    title="",
+    x_label="EIXO X",
+    y_label="EIXO Y",
+    show_grid=False,
+    show_box=True,
+    color_style="random",
+    linewidth=2.0,
+    title_fontsize=14,
+    axis_fontsize=12,
+    linestyle="cycle",
+    alpha=0.8,
+    grid_color="#E6E6E6",
+    fig_width=7,
+    fig_height=6,
+    remove_borders=False,
+    marker=None,
+    show_legend=True,
+    legend_title=None,
+    legend_box=False,
+    save_fig=False,
+    dpi=600,
+    file_format="pdf",
+    filename="multierrorgraph",
+    show_plot=True,
+    ecolor=None,
+    elinewidth=1.5,
+    capsize=3.0,
+    capthick=1.5,
+):
+    """
+    Gera um gráfico 2D com "N" curvas sobrepostas e suas respectivas barras de erro, com pré-definições de estilo focadas na formalidade científica. A função permite a personalização completa.
+
+    Args:
+        x_list (list de arrays): Lista contendo os arrays do eixo X para cada curva.
+        y_list (list de arrays): Lista contendo os arrays do eixo Y para cada curva.
+        x_err_list (list de arrays, optional): Lista contendo os arrays de erro do eixo X para cada curva. Default é None.
+        y_err_list (list de arrays, optional): Lista contendo os arrays de erro do eixo Y para cada curva. Default é None.
+        curve_names (list de str, optional): Nomes de cada curva para a legenda. Default é None.
+        title (str, optional): Título principal do gráfico. Default é "".
+        x_label (str, optional): Rótulo do eixo X. Default é "EIXO X".
+        y_label (str, optional): Rótulo do eixo Y. Default é "EIXO Y".
+        show_grid (bool, optional): Ativa a grade no fundo. Default é False.
+        show_box (bool, optional): Mantém a caixa ao redor do gráfico. Default é True.
+        color_style (str ou list, optional): 'random', 'preto', ou lista de cores customizada. Default é "random".
+        linewidth (float, optional): Espessura das linhas. Default é 2.0.
+        title_fontsize (int, optional): Tamanho da fonte do título. Default é 14.
+        axis_fontsize (int, optional): Tamanho da fonte dos eixos. Default é 12.
+        linestyle (str ou list, optional): 'cycle' para alternar automaticamente, ou lista customizada. Default é "cycle".
+        alpha (float, optional): Opacidade das linhas e dos erros (0.0 a 1.0). Default é 0.8.
+        grid_color (str, optional): Cor da grade. Default é "#E6E6E6".
+        fig_width (float, optional): Largura da figura em polegadas. Default é 7.
+        fig_height (float, optional): Altura da figura em polegadas. Default é 6.
+        remove_borders (bool, optional): Remove as bordas superior e direita. Default é False.
+        marker (str, optional): Marcador dos pontos. Default é None.
+        show_legend (bool, optional): Exibe a legenda. Default é True.
+        legend_title (str, optional): Título da caixa de legenda. Default é None.
+        legend_box (bool, optional): Adiciona moldura ao redor da legenda. Default é False.
+        save_fig (bool, optional): Salva a figura no disco. Default é False.
+        dpi (int, optional): Resolução de salvamento. Default é 600.
+        file_format (str, optional): Formato do arquivo. Default é "pdf".
+        filename (str, optional): Nome do arquivo. Default é "multierrorgraph".
+        show_plot (bool, optional): Exibe o gráfico na tela. Default é True.
+        ecolor (str ou list, optional): Cor das barras de erro. Se None, utiliza a mesma cor da respectiva linha. Default é None.
+        elinewidth (float, optional): Espessura das barras de erro. Default é 1.5.
+        capsize (float, optional): Tamanho dos traços perpendiculares (caps). Default é 3.0.
+        capthick (float, optional): Espessura dos traços perpendiculares (caps). Default é 1.5.
+
+    Returns:
+        None
+
+    Example:
+        >>> import numpy as np
+        >>> x1, y1 = np.linspace(0.1, 5, 10), np.log(np.linspace(0.1, 5, 10))
+        >>> x2, y2 = np.linspace(0.1, 5, 10), np.sqrt(np.linspace(0.1, 5, 10))
+        >>> err_y1 = np.random.uniform(0.1, 0.3, size=len(y1))
+        >>> err_y2 = np.random.uniform(0.1, 0.2, size=len(y2))
+        >>> multierror([x1, x2], [y1, y2], y_err_list=[err_y1, err_y2], curve_names=["Log", "Raiz"])
+    """
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "mathtext.fontset": "dejavuserif",
+            "axes.linewidth": 1.2,
+            "xtick.direction": "in",
+            "ytick.direction": "in",
+            "xtick.top": True,
+            "ytick.right": True,
+            "xtick.labelsize": axis_fontsize - 2,
+            "ytick.labelsize": axis_fontsize - 2,
+            "legend.frameon": False,
+        }
+    )
+
+    if len(x_list) != len(y_list):
+        raise ValueError(
+            "O número de listas em X deve ser igual ao número de listas em Y."
+        )
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=100)
+    num_curves = len(x_list)
+
+    # Definição de Cores
+    if color_style == "preto":
+        colors = ["black"] * num_curves
+    elif color_style == "random":
+        cmap = plt.get_cmap("tab10")
+        colors = [cmap(i % 10) for i in range(num_curves)]
+    elif isinstance(color_style, list):
+        colors = color_style
+    else:
+        colors = [color_style] * num_curves
+
+    # Definição de Linestyles
+    if linestyle == "cycle":
+        styles_list = ["-", ":", "--", "-."]
+    elif isinstance(linestyle, list):
+        styles_list = linestyle
+    else:
+        styles_list = [linestyle]
+
+    # Plotagem de cada curva com erro
+    for i in range(num_curves):
+        curve_label = curve_names[i] if curve_names else f"Curva {i+1}"
+
+        # Tratamento seguro para os erros (podem ser None)
+        curr_x_err = x_err_list[i] if x_err_list and i < len(x_err_list) else None
+        curr_y_err = y_err_list[i] if y_err_list and i < len(y_err_list) else None
+
+        # Cor da linha e do erro
+        curr_color = colors[i % len(colors)]
+
+        if isinstance(ecolor, list):
+            curr_ecolor = ecolor[i % len(ecolor)]
+        else:
+            curr_ecolor = ecolor if ecolor else curr_color
+
+        ax.errorbar(
+            x_list[i],
+            y_list[i],
+            xerr=curr_x_err,
+            yerr=curr_y_err,
+            color=curr_color,
+            linewidth=linewidth,
+            linestyle=styles_list[i % len(styles_list)],
+            alpha=alpha,
+            marker=marker,
+            zorder=3,
+            label=curve_label,
+            ecolor=curr_ecolor,
+            elinewidth=elinewidth,
+            capsize=capsize,
+            capthick=capthick,
+        )
+
+    # Estilização
+    if title:
+        ax.set_title(title, fontsize=title_fontsize, pad=15, fontweight="bold")
+
+    ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=8)
+    ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=8)
+    ax.set_xscale("linear")
+    ax.set_yscale("linear")
+
+    ax.xaxis.set_minor_locator(AutoMinorLocator())
+    ax.yaxis.set_minor_locator(AutoMinorLocator())
+    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="minor", length=3, width=1.0)
+
+    if show_legend:
+        ax.legend(
+            title=legend_title,
+            frameon=legend_box,
+            fontsize=axis_fontsize * 0.9,
+            title_fontsize=axis_fontsize,
+            loc="best",
+            edgecolor="black" if legend_box else None,
+        )
+
+    if show_grid:
+        ax.grid(True, linestyle="--", linewidth=0.5, color=grid_color, alpha=0.7)
+        ax.set_axisbelow(True)
+
+    if not show_box:
+        ax.set_frame_on(False)
+    elif remove_borders:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+    else:
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color("black")
+
+    plt.tight_layout()
+
+    # Salvamento e Exibição
+    if save_fig:
+        if not os.path.exists("figures"):
+            os.makedirs("figures")
+        filepath = f"figures/{filename}.{file_format}"
+        plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor="white")
+
+    if show_plot:
+        plt.show()
+    else:
+        plt.close(fig)
+
+    return None
+
+
 def elipse(
     x_data,
     y_data,
