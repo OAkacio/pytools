@@ -803,7 +803,6 @@ def elipse(
         norm=norm,
         extend=colorbar_format,
         antialiased=True,
-        rasterized=True,
     )
     if ellipse_levels is not None:
         if sigma_names is None:
