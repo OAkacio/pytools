@@ -316,3 +316,54 @@ def hidestatus(message, NSpaces=10):
     """
     rec = " " * NSpaces
     print(f"{rec}{GRAY}{DIM}{message}{RESET}")
+
+
+def structurelog(message, index="", label="", color="blue"):
+    """
+    Exibe uma mensagem de status estruturada no terminal podendo ser estilizada com coloração, index e labels.
+
+    Args:
+        message (str): O texto descritivo principal do status ou evento atual a ser exibido.
+        index (str): O pré-texto secundário descritivo a ser exibido antes do texto principal.
+        label (str): O pós-texto primário descritivo a ser exibido antes do texto principal.
+        color (str): A cor a ser exibida. Pode ser "blue", "cyan", "gold", "gray", "red", "lightgreen", "dim", "bold" ,"reset".
+
+    Returns:
+        None
+
+    Exemplo:
+        >>> sy.status(message="Calculando distâncias cosmológicas...", index="'01:15:03'", label="STATUS", color="blue")
+    """
+    blue = "\033[94m"
+    cyan = "\033[96m"
+    gold = "\033[33m"
+    gray = "\033[90m"
+    red = "\033[91m"
+    bold = "\033[1m"
+    dim = "\033[2m"
+    reset = "\033[0m"
+    lightgreen = "\033[92m"
+    label = label.upper()
+
+    if color == "blue":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {BLUE} {message} {RESET}")
+    elif color == "cyan":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {CYAN} {message} {RESET}")
+    elif color == "gold":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {GOLD} {message} {RESET}")
+    elif color == "gray":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {GRAY} {message} {RESET}")
+    elif color == "red":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {RED} {message} {RESET}")
+    elif color == "lightgreen":
+        print(
+            f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {LIGHTGREEN} {message} {RESET}"
+        )
+    elif color == "dim":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {DIM} {message} {RESET}")
+    elif color == "reset":
+        print(
+            f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {RESET} {message} {RESET}"
+        )
+    elif color == "bold":
+        print(f"\n  {GRAY}{BOLD}» {index} {RESET} | {label} | {BOLD} {message} {RESET}")
