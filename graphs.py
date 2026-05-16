@@ -112,7 +112,7 @@ def basic(
     ax.set_yscale("linear")
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
-    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="major", length=8, width=1.2)
     ax.tick_params(which="minor", length=3, width=1.0)
     if show_grid:
         ax.grid(True, linestyle="--", linewidth=0.5, color=grid_color, alpha=0.7)
@@ -259,7 +259,7 @@ def basicerror(
     ax.set_yscale("linear")
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
-    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="major", length=8, width=1.2)
     ax.tick_params(which="minor", length=3, width=1.0)
 
     if show_grid:
@@ -320,6 +320,8 @@ def multi(
     file_format="pdf",
     filename="multigraph",
     show_plot=True,
+    x_lim=None,
+    y_lim=None,
 ):
     """
     Gera um gráfico 2D com "N" curvas sobrepostas com pré-definições de estilo focadas na formalidade científica. A função permite a personalização completa.
@@ -352,6 +354,8 @@ def multi(
         file_format (str, optional): Formato do arquivo. Default é "pdf".
         filename (str, optional): Nome do arquivo. Default é "multigraph".
         show_plot (bool, optional): Exibe o gráfico na tela. Default é True.
+        x_lim (tuple, optional): Limites do eixo X no formato (min, max). Default é None.
+        y_lim (tuple, optional): Limites do eixo Y no formato (min, max). Default é None.
 
     Returns:
         None
@@ -414,9 +418,15 @@ def multi(
     ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=8)
     ax.set_xscale("linear")
     ax.set_yscale("linear")
+
+    if x_lim is not None:
+        ax.set_xlim(x_lim)
+    if y_lim is not None:
+        ax.set_ylim(y_lim)
+
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
-    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="major", length=8, width=1.2)
     ax.tick_params(which="minor", length=3, width=1.0)
     if show_legend:
         ax.legend(
@@ -623,7 +633,7 @@ def multierror(
 
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
-    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="major", length=8, width=1.2)
     ax.tick_params(which="minor", length=3, width=1.0)
 
     if show_legend:
@@ -1055,7 +1065,7 @@ def basicstyle(
     ax.set_yscale("linear")
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
-    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="major", length=8, width=1.2)
     ax.tick_params(which="minor", length=3, width=1.0)
     if title or highlight_point or sigma_intervals is not None:
         ax.legend(frameon=show_legend_frame, fontsize=axis_fontsize * 0.9)
@@ -1279,7 +1289,7 @@ def basicstylemulti_log(
         LogLocator(base=10.0, subs=np.arange(2, 10) * 0.1, numticks=10)
     )
     ax.yaxis.set_minor_formatter(NullFormatter())
-    ax.tick_params(which="major", length=6, width=1.2)
+    ax.tick_params(which="major", length=8, width=1.2)
     ax.tick_params(which="minor", length=3, width=1.0)
     if title or highlight_point or sigma_intervals is not None or n_curves > 1:
         ax.legend(frameon=show_legend_frame, fontsize=axis_fontsize * 0.9)
@@ -1320,4 +1330,395 @@ def basicstylemulti_log(
         plt.show()
     else:
         plt.close(fig)
+    return None
+
+
+def plot(
+    x_data,
+    y_data,
+    x_err=None,
+    y_err=None,
+    curve_names=None,
+    title="",
+    x_label="EIXO X",
+    y_label="EIXO Y",
+    x_scale="linear",
+    y_scale="linear",
+    x_lim=None,
+    y_lim=None,
+    show_grid=False,
+    show_box=True,
+    remove_borders=False,
+    color_style="random",
+    linewidth=2.0,
+    linestyle="cycle",
+    alpha=0.8,
+    marker=None,
+    ecolor=None,
+    elinewidth=1.5,
+    capsize=3.0,
+    capthick=1.5,
+    highlight_point=None,
+    highlight_color="red",
+    highlight_marker="o",
+    highlight_size=150,
+    highlight_label="Destaque",
+    sigma_intervals=None,
+    sigma_colors=("#ccebc5", "#fff2ae", "#fbb4ae"),
+    sigma_line_colors=("forestgreen", "orange", "lightcoral"),
+    sigma_labels=("1σ (68.3%)", "2σ (95.4%)", "3σ (99.7%)"),
+    show_sigma_lines=True,
+    sigma_alpha=0.6,
+    sigma_linewidth=1.5,
+    sigma_linestyle="--",
+    show_legend=True,
+    legend_title=None,
+    legend_box=False,
+    legend_fontsize=None,
+    title_fontsize=16,
+    axis_fontsize=12,
+    title_pad=15,
+    label_pad=8,
+    fig_width=7,
+    fig_height=6,
+    figure_dpi=100,
+    grid_color="#E6E6E6",
+    grid_alpha=0.7,
+    grid_linewidth=0.5,
+    grid_linestyle="--",
+    major_tick_length=8.0,
+    major_tick_width=1.2,
+    minor_tick_length=3.0,
+    minor_tick_width=1.0,
+    save_fig=False,
+    dpi=600,
+    file_format="pdf",
+    filename="plot_graph",
+    show_plot=True,
+):
+    """
+    Gera um gráfico 2D unificado e blindado contra erros de iteração.
+    Suporta curvas múltiplas, barras de erro, sigmas, eixos logarítmicos e ocultação inteligente de legendas.
+
+    Args:
+        x_data (array-like ou list): Dados do eixo X.
+        y_data (array-like ou list): Dados do eixo Y.
+        x_err (array-like ou list, optional): Erros do eixo X.
+        y_err (array-like ou list, optional): Erros do eixo Y.
+        curve_names (str ou list, optional): Rótulos das curvas. Usar None para ocultar da legenda.
+        title (str, optional): Título principal.
+        x_label (str, optional): Rótulo do eixo X.
+        y_label (str, optional): Rótulo do eixo Y.
+        x_scale (str, optional): Escala do eixo X ('linear' ou 'log'). Default é 'linear'.
+        y_scale (str, optional): Escala do eixo Y ('linear' ou 'log'). Default é 'linear'.
+        x_lim (tuple, optional): Limites do eixo X.
+        y_lim (tuple, optional): Limites do eixo Y.
+        show_grid (bool, optional): Ativa grade.
+        show_box (bool, optional): Mantém caixa do gráfico.
+        remove_borders (bool, optional): Remove bordas superior e direita.
+        color_style (str/list, optional): Estilo de cor ('random', 'preto', cor única ou lista).
+        linewidth (float/list, optional): Espessura(s) das linhas das curvas.
+        linestyle (str/list, optional): Estilo(s) das linhas ('cycle', string única ou lista).
+        alpha (float/list, optional): Opacidade(s) das curvas.
+        marker (str/list, optional): Marcador(es) dos pontos.
+        ecolor (str/list, optional): Cor das barras de erro.
+        elinewidth (float, optional): Espessura da barra de erro.
+        capsize (float, optional): Tamanho dos traços do erro.
+        capthick (float, optional): Espessura dos traços do erro.
+        highlight_point (tuple, optional): Coordenadas (x, y) de um ponto de destaque.
+        highlight_color (str, optional): Cor do destaque.
+        highlight_marker (str, optional): Marcador do destaque.
+        highlight_size (int, optional): Tamanho do destaque.
+        highlight_label (str, optional): Rótulo do destaque. Usar None para ocultar da legenda.
+        sigma_intervals (list, optional): Intervalos (x_min, x_max) de regiões de erro.
+        sigma_colors (tuple/list, optional): Cores de preenchimento das regiões sigma.
+        sigma_line_colors (tuple/list, optional): Cores das linhas delimitadoras das regiões sigma.
+        sigma_labels (tuple/str/list, optional): Rótulos das regiões sigma. Usar None para ocultar da legenda.
+        show_sigma_lines (bool, optional): Exibe linhas delimitadoras dos sigmas.
+        sigma_alpha (float, optional): Opacidade das regiões sigma.
+        sigma_linewidth (float, optional): Espessura da linha dos limites sigma.
+        sigma_linestyle (str, optional): Estilo da linha dos limites sigma.
+        show_legend (bool, optional): Trava global da legenda. Se False, a legenda não aparece.
+        legend_title (str, optional): Título da legenda.
+        legend_box (bool, optional): Borda da legenda.
+        legend_fontsize (float, optional): Tamanho da fonte da legenda.
+        title_fontsize (int, optional): Tamanho do título.
+        axis_fontsize (int, optional): Tamanho dos eixos.
+        title_pad (float, optional): Espaçamento do título em relação ao gráfico.
+        label_pad (float, optional): Espaçamento dos rótulos dos eixos em relação aos números.
+        fig_width (float, optional): Largura da figura.
+        fig_height (float, optional): Altura da figura.
+        figure_dpi (int, optional): Resolução de exibição da figura.
+        grid_color (str, optional): Cor da grade.
+        grid_alpha (float, optional): Opacidade da grade.
+        grid_linewidth (float, optional): Espessura da grade.
+        grid_linestyle (str, optional): Estilo de linha da grade.
+        major_tick_length (float, optional): Comprimento das marcações principais.
+        major_tick_width (float, optional): Espessura das marcações principais.
+        minor_tick_length (float, optional): Comprimento das marcações menores.
+        minor_tick_width (float, optional): Espessura das marcações menores.
+        save_fig (bool, optional): Salva em disco.
+        dpi (int, optional): Resolução do salvamento.
+        file_format (str, optional): Formato salvo.
+        filename (str, optional): Nome do arquivo com suporte a subdiretórios.
+        show_plot (bool, optional): Exibe a interface gráfica.
+
+    Returns:
+        None
+    """
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "mathtext.fontset": "dejavuserif",
+            "axes.linewidth": 1.2,
+            "xtick.direction": "in",
+            "ytick.direction": "in",
+            "xtick.top": True,
+            "ytick.right": True,
+            "xtick.labelsize": axis_fontsize - 2,
+            "ytick.labelsize": axis_fontsize - 2,
+            "legend.frameon": legend_box,
+        }
+    )
+
+    if x_data is None or (hasattr(x_data, "__len__") and len(x_data) == 0):
+        return None
+
+    if not (
+        isinstance(x_data, list)
+        and len(x_data) > 0
+        and hasattr(x_data[0], "__iter__")
+        and not isinstance(x_data[0], str)
+    ):
+        x_list = [x_data]
+        y_list = [y_data]
+        x_err_list = [x_err] if x_err is not None else [None]
+        y_err_list = [y_err] if y_err is not None else [None]
+    else:
+        x_list = x_data
+        y_list = y_data
+        x_err_list = (
+            x_err
+            if isinstance(x_err, list)
+            and (len(x_err) == 0 or hasattr(x_err[0], "__iter__"))
+            else [x_err] * len(x_list)
+        )
+        y_err_list = (
+            y_err
+            if isinstance(y_err, list)
+            and (len(y_err) == 0 or hasattr(y_err[0], "__iter__"))
+            else [y_err] * len(y_list)
+        )
+
+    if len(x_list) != len(y_list):
+        raise ValueError(
+            "O número de arrays em X deve ser igual ao número de arrays em Y."
+        )
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=figure_dpi)
+    num_curves = len(x_list)
+
+    colors = (
+        color_style
+        if isinstance(color_style, list)
+        else (
+            ["black"] * num_curves
+            if color_style == "preto"
+            else (
+                [plt.get_cmap("tab10")(i % 10) for i in range(num_curves)]
+                if color_style == "random"
+                else [color_style] * num_curves
+            )
+        )
+    )
+
+    styles_list = (
+        linestyle
+        if isinstance(linestyle, list)
+        else (["-", ":", "--", "-."] if linestyle == "cycle" else [linestyle])
+    )
+
+    widths_list = linewidth if isinstance(linewidth, list) else [linewidth]
+    alphas_list = alpha if isinstance(alpha, list) else [alpha]
+    markers_list = marker if isinstance(marker, list) else [marker]
+    ecolors_list = ecolor if isinstance(ecolor, list) else [ecolor]
+
+    c_names = [curve_names] if isinstance(curve_names, str) else curve_names
+
+    if sigma_intervals is not None:
+        s_labels_list = (
+            [sigma_labels] if isinstance(sigma_labels, str) else sigma_labels
+        )
+        s_colors_list = (
+            [sigma_colors] if isinstance(sigma_colors, str) else sigma_colors
+        )
+        s_line_colors_list = (
+            [sigma_line_colors]
+            if isinstance(sigma_line_colors, str)
+            else sigma_line_colors
+        )
+
+        for i in range(len(sigma_intervals) - 1, -1, -1):
+            x_min, x_max = sigma_intervals[i]
+            s_color = s_colors_list[i % len(s_colors_list)] if s_colors_list else "gray"
+            l_color = (
+                s_line_colors_list[i % len(s_line_colors_list)]
+                if s_line_colors_list
+                else s_color
+            )
+            s_label = (
+                s_labels_list[i]
+                if s_labels_list and i < len(s_labels_list) and s_labels_list[i]
+                else None
+            )
+
+            ax.axvspan(
+                x_min, x_max, color=s_color, alpha=sigma_alpha, label=s_label, zorder=1
+            )
+            if show_sigma_lines:
+                ax.axvline(
+                    x_min,
+                    color=l_color,
+                    linestyle=sigma_linestyle,
+                    linewidth=sigma_linewidth,
+                    zorder=2,
+                )
+                ax.axvline(
+                    x_max,
+                    color=l_color,
+                    linestyle=sigma_linestyle,
+                    linewidth=sigma_linewidth,
+                    zorder=2,
+                )
+
+    for i in range(num_curves):
+        c_label = c_names[i] if c_names and i < len(c_names) and c_names[i] else None
+        curr_x_err = x_err_list[i] if i < len(x_err_list) else None
+        curr_y_err = y_err_list[i] if i < len(y_err_list) else None
+
+        curr_color = colors[i % len(colors)]
+        curr_style = styles_list[i % len(styles_list)]
+        curr_width = widths_list[i % len(widths_list)]
+        curr_alpha = alphas_list[i % len(alphas_list)]
+        curr_marker = markers_list[i % len(markers_list)]
+
+        curr_ecolor = ecolors_list[i % len(ecolors_list)]
+        if curr_ecolor is None:
+            curr_ecolor = curr_color
+
+        if curr_x_err is not None or curr_y_err is not None:
+            ax.errorbar(
+                x_list[i],
+                y_list[i],
+                xerr=curr_x_err,
+                yerr=curr_y_err,
+                color=curr_color,
+                linewidth=curr_width,
+                linestyle=curr_style,
+                alpha=curr_alpha,
+                marker=curr_marker,
+                zorder=3,
+                label=c_label,
+                ecolor=curr_ecolor,
+                elinewidth=elinewidth,
+                capsize=capsize,
+                capthick=capthick,
+            )
+        else:
+            ax.plot(
+                x_list[i],
+                y_list[i],
+                color=curr_color,
+                linewidth=curr_width,
+                linestyle=curr_style,
+                alpha=curr_alpha,
+                marker=curr_marker,
+                zorder=3,
+                label=c_label,
+            )
+
+    if highlight_point is not None:
+        h_label = highlight_label if highlight_label else None
+        ax.scatter(
+            highlight_point[0],
+            highlight_point[1],
+            color=highlight_color,
+            marker=highlight_marker,
+            s=highlight_size,
+            label=h_label,
+            zorder=5,
+        )
+
+    if title:
+        ax.set_title(title, fontsize=title_fontsize, pad=title_pad, fontweight="bold")
+
+    ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=label_pad)
+    ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=label_pad)
+    ax.set_xscale(x_scale)
+    ax.set_yscale(y_scale)
+
+    if x_lim is not None:
+        ax.set_xlim(x_lim)
+    if y_lim is not None:
+        ax.set_ylim(y_lim)
+
+    if x_scale == "linear":
+        ax.xaxis.set_minor_locator(AutoMinorLocator())
+    if y_scale == "linear":
+        ax.yaxis.set_minor_locator(AutoMinorLocator())
+
+    ax.tick_params(which="major", length=major_tick_length, width=major_tick_width)
+    ax.tick_params(which="minor", length=minor_tick_length, width=minor_tick_width)
+
+    if show_grid:
+        ax.grid(
+            True,
+            linestyle=grid_linestyle,
+            linewidth=grid_linewidth,
+            color=grid_color,
+            alpha=grid_alpha,
+        )
+        ax.set_axisbelow(True)
+
+    if show_legend:
+        handles, labels = ax.get_legend_handles_labels()
+        if labels:
+            final_legend_fontsize = (
+                legend_fontsize if legend_fontsize else axis_fontsize * 0.9
+            )
+            ax.legend(
+                title=legend_title,
+                frameon=legend_box,
+                fontsize=final_legend_fontsize,
+                title_fontsize=axis_fontsize,
+                loc="best",
+                edgecolor="black" if legend_box else None,
+            )
+
+    if not show_box:
+        ax.set_frame_on(False)
+    elif remove_borders:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(True)
+        ax.spines["left"].set_visible(True)
+        ax.spines["bottom"].set_color("black")
+        ax.spines["left"].set_color("black")
+    else:
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color("black")
+
+    plt.tight_layout()
+
+    if save_fig:
+        filepath = f"figures/{filename}.{file_format}"
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor="white")
+
+    if show_plot:
+        plt.show()
+    else:
+        plt.close(fig)
+
     return None
