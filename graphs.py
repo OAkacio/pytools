@@ -1148,6 +1148,29 @@ def plot(
     major_tick_width=1.2,
     minor_tick_length=3.0,
     minor_tick_width=1.0,
+    show_residuals=False,
+    res_x_data=None,
+    res_y_data=None,
+    res_x_err=None,
+    res_y_err=None,
+    res_y_label="Resíduos",
+    res_y_lim=None,
+    res_y_scale="linear",
+    res_color_style="black",
+    res_linewidth=1.5,
+    res_linestyle="",
+    res_alpha=0.8,
+    res_marker="o",
+    res_ecolor=None,
+    res_elinewidth=1.5,
+    res_capsize=3.0,
+    res_capthick=1.5,
+    res_hline_y=0.0,
+    res_hline_color="black",
+    res_hline_style="--",
+    res_hline_width=1.0,
+    gridspec_height_ratios=[3, 1],
+    hspace=0.05,
     save_fig=False,
     dpi=600,
     file_format="pdf",
@@ -1155,55 +1178,55 @@ def plot(
     show_plot=True,
 ):
     """
-    Gera um gráfico 2D unificado e blindado contra erros de iteração.
-    Suporta curvas múltiplas, barras de erro, sigmas, eixos logarítmicos e ocultação inteligente de legendas.
+    Gera um gráfico 2D unificado com personalização completa, incluindo a opção de adicionar
+    um painel inferior para exibir N resíduos atrelados ao eixo X principal.
 
     Args:
-        x_data (array-like ou list): Dados do eixo X.
-        y_data (array-like ou list): Dados do eixo Y.
-        x_err (array-like ou list, optional): Erros do eixo X.
-        y_err (array-like ou list, optional): Erros do eixo Y.
-        curve_names (str ou list, optional): Rótulos das curvas. Usar None para ocultar da legenda.
+        x_data (array-like/list): Dados do eixo X principal.
+        y_data (array-like/list): Dados do eixo Y principal.
+        x_err (array-like/list, optional): Erros do eixo X principal.
+        y_err (array-like/list, optional): Erros do eixo Y principal.
+        curve_names (str/list, optional): Rótulos das curvas.
         title (str, optional): Título principal.
         x_label (str, optional): Rótulo do eixo X.
         y_label (str, optional): Rótulo do eixo Y.
-        x_scale (str, optional): Escala do eixo X ('linear' ou 'log'). Default é 'linear'.
-        y_scale (str, optional): Escala do eixo Y ('linear' ou 'log'). Default é 'linear'.
+        x_scale (str, optional): Escala do eixo X ('linear', 'log').
+        y_scale (str, optional): Escala do eixo Y principal ('linear', 'log').
         x_lim (tuple, optional): Limites do eixo X.
-        y_lim (tuple, optional): Limites do eixo Y.
-        show_grid (bool, optional): Ativa grade.
-        show_box (bool, optional): Mantém caixa do gráfico.
+        y_lim (tuple, optional): Limites do eixo Y principal.
+        show_grid (bool, optional): Ativa grade para os painéis.
+        show_box (bool, optional): Mantém caixa dos gráficos.
         remove_borders (bool, optional): Remove bordas superior e direita.
-        color_style (str/list, optional): Estilo de cor ('random', 'preto', cor única ou lista).
-        linewidth (float/list, optional): Espessura(s) das linhas das curvas.
-        linestyle (str/list, optional): Estilo(s) das linhas ('cycle', string única ou lista).
-        alpha (float/list, optional): Opacidade(s) das curvas.
-        marker (str/list, optional): Marcador(es) dos pontos.
-        ecolor (str/list, optional): Cor das barras de erro.
-        elinewidth (float, optional): Espessura da barra de erro.
-        capsize (float, optional): Tamanho dos traços do erro.
-        capthick (float, optional): Espessura dos traços do erro.
-        highlight_point (tuple, optional): Coordenadas (x, y) de um ponto de destaque.
+        color_style (str/list, optional): Estilos de cor das curvas principais.
+        linewidth (float/list, optional): Espessura(s) das linhas principais.
+        linestyle (str/list, optional): Estilo(s) das linhas principais.
+        alpha (float/list, optional): Opacidade(s) das curvas principais.
+        marker (str/list, optional): Marcador(es) das curvas principais.
+        ecolor (str/list, optional): Cor das barras de erro principais.
+        elinewidth (float, optional): Espessura da barra de erro principal.
+        capsize (float, optional): Tamanho dos traços do erro principal.
+        capthick (float, optional): Espessura dos traços do erro principal.
+        highlight_point (tuple, optional): Coordenadas de um ponto de destaque.
         highlight_color (str, optional): Cor do destaque.
         highlight_marker (str, optional): Marcador do destaque.
         highlight_size (int, optional): Tamanho do destaque.
-        highlight_label (str, optional): Rótulo do destaque. Usar None para ocultar da legenda.
-        sigma_intervals (list, optional): Intervalos (x_min, x_max) de regiões de erro.
-        sigma_colors (tuple/list, optional): Cores de preenchimento das regiões sigma.
-        sigma_line_colors (tuple/list, optional): Cores das linhas delimitadoras das regiões sigma.
-        sigma_labels (tuple/str/list, optional): Rótulos das regiões sigma. Usar None para ocultar da legenda.
+        highlight_label (str, optional): Rótulo do destaque.
+        sigma_intervals (list, optional): Intervalos de regiões de confiança.
+        sigma_colors (tuple/list, optional): Cores de preenchimento dos sigmas.
+        sigma_line_colors (tuple/list, optional): Cores das linhas dos sigmas.
+        sigma_labels (tuple/str/list, optional): Rótulos das regiões sigma.
         show_sigma_lines (bool, optional): Exibe linhas delimitadoras dos sigmas.
-        sigma_alpha (float, optional): Opacidade das regiões sigma.
-        sigma_linewidth (float, optional): Espessura da linha dos limites sigma.
-        sigma_linestyle (str, optional): Estilo da linha dos limites sigma.
-        show_legend (bool, optional): Trava global da legenda. Se False, a legenda não aparece.
-        legend_title (str, optional): Título da legenda.
-        legend_box (bool, optional): Borda da legenda.
-        legend_fontsize (float, optional): Tamanho da fonte da legenda.
+        sigma_alpha (float, optional): Opacidade dos sigmas.
+        sigma_linewidth (float, optional): Espessura da linha dos sigmas.
+        sigma_linestyle (str, optional): Estilo da linha dos sigmas.
+        show_legend (bool, optional): Ativa a legenda do gráfico principal.
+        legend_title (str, optional): Título da legenda principal.
+        legend_box (bool, optional): Borda da legenda principal.
+        legend_fontsize (float, optional): Tamanho da fonte da legenda principal.
         title_fontsize (int, optional): Tamanho do título.
         axis_fontsize (int, optional): Tamanho dos eixos.
-        title_pad (float, optional): Espaçamento do título em relação ao gráfico.
-        label_pad (float, optional): Espaçamento dos rótulos dos eixos em relação aos números.
+        title_pad (float, optional): Espaçamento do título.
+        label_pad (float, optional): Espaçamento dos rótulos.
         fig_width (float, optional): Largura da figura.
         fig_height (float, optional): Altura da figura.
         figure_dpi (int, optional): Resolução de exibição da figura.
@@ -1215,6 +1238,29 @@ def plot(
         major_tick_width (float, optional): Espessura das marcações principais.
         minor_tick_length (float, optional): Comprimento das marcações menores.
         minor_tick_width (float, optional): Espessura das marcações menores.
+        show_residuals (bool, optional): Ativa o painel de resíduos. Default é False.
+        res_x_data (array-like/list, optional): X dos resíduos (se None, usa x_data).
+        res_y_data (array-like/list, optional): Y dos resíduos. Requerido se show_residuals for True.
+        res_x_err (array-like/list, optional): Erros X dos resíduos.
+        res_y_err (array-like/list, optional): Erros Y dos resíduos.
+        res_y_label (str, optional): Rótulo do eixo Y dos resíduos.
+        res_y_lim (tuple, optional): Limites Y dos resíduos.
+        res_y_scale (str, optional): Escala Y dos resíduos.
+        res_color_style (str/list, optional): Cor das curvas/pontos de resíduos.
+        res_linewidth (float/list, optional): Espessura da linha dos resíduos.
+        res_linestyle (str/list, optional): Estilo da linha dos resíduos.
+        res_alpha (float/list, optional): Opacidade dos resíduos.
+        res_marker (str/list, optional): Marcador dos resíduos.
+        res_ecolor (str/list, optional): Cor das barras de erro dos resíduos.
+        res_elinewidth (float, optional): Espessura das barras de erro dos resíduos.
+        res_capsize (float, optional): Caps das barras de erro dos resíduos.
+        res_capthick (float, optional): Espessura dos caps dos resíduos.
+        res_hline_y (float, optional): Valor Y da linha base dos resíduos.
+        res_hline_color (str, optional): Cor da linha base dos resíduos.
+        res_hline_style (str, optional): Estilo da linha base dos resíduos.
+        res_hline_width (float, optional): Espessura da linha base dos resíduos.
+        gridspec_height_ratios (list, optional): Razão de altura entre painel principal e resíduos.
+        hspace (float, optional): Espaçamento vertical entre os painéis.
         save_fig (bool, optional): Salva em disco.
         dpi (int, optional): Resolução do salvamento.
         file_format (str, optional): Formato salvo.
@@ -1273,7 +1319,58 @@ def plot(
             "O número de arrays em X deve ser igual ao número de arrays em Y."
         )
 
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=figure_dpi)
+    if show_residuals:
+        if res_y_data is None:
+            raise ValueError(
+                "res_y_data não pode ser None quando show_residuals for True."
+            )
+
+        actual_res_x = res_x_data if res_x_data is not None else x_data
+
+        if not (
+            isinstance(actual_res_x, list)
+            and len(actual_res_x) > 0
+            and hasattr(actual_res_x[0], "__iter__")
+            and not isinstance(actual_res_x[0], str)
+        ):
+            rx_list = [actual_res_x]
+            ry_list = [res_y_data]
+            rx_err_list = [res_x_err] if res_x_err is not None else [None]
+            ry_err_list = [res_y_err] if res_y_err is not None else [None]
+        else:
+            rx_list = actual_res_x
+            ry_list = res_y_data
+            rx_err_list = (
+                res_x_err
+                if isinstance(res_x_err, list)
+                and (len(res_x_err) == 0 or hasattr(res_x_err[0], "__iter__"))
+                else [res_x_err] * len(rx_list)
+            )
+            ry_err_list = (
+                res_y_err
+                if isinstance(res_y_err, list)
+                and (len(res_y_err) == 0 or hasattr(res_y_err[0], "__iter__"))
+                else [res_y_err] * len(ry_list)
+            )
+
+        if len(rx_list) != len(ry_list):
+            raise ValueError(
+                "O número de arrays em res_x_data deve ser igual ao de res_y_data."
+            )
+
+    if show_residuals:
+        fig, (ax, ax_res) = plt.subplots(
+            2,
+            1,
+            figsize=(fig_width, fig_height),
+            dpi=figure_dpi,
+            sharex=True,
+            gridspec_kw={"height_ratios": gridspec_height_ratios, "hspace": hspace},
+        )
+    else:
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=figure_dpi)
+        ax_res = None
+
     num_curves = len(x_list)
 
     colors = (
@@ -1300,7 +1397,6 @@ def plot(
     alphas_list = alpha if isinstance(alpha, list) else [alpha]
     markers_list = marker if isinstance(marker, list) else [marker]
     ecolors_list = ecolor if isinstance(ecolor, list) else [ecolor]
-
     c_names = [curve_names] if isinstance(curve_names, str) else curve_names
 
     if sigma_intervals is not None:
@@ -1407,36 +1503,142 @@ def plot(
             zorder=5,
         )
 
+    if show_residuals:
+        res_num_curves = len(rx_list)
+        res_colors = (
+            res_color_style
+            if isinstance(res_color_style, list)
+            else (
+                ["black"] * res_num_curves
+                if res_color_style == "preto"
+                else (
+                    [plt.get_cmap("tab10")(i % 10) for i in range(res_num_curves)]
+                    if res_color_style == "random"
+                    else [res_color_style] * res_num_curves
+                )
+            )
+        )
+        res_styles_list = (
+            res_linestyle
+            if isinstance(res_linestyle, list)
+            else (
+                ["-", ":", "--", "-."] if res_linestyle == "cycle" else [res_linestyle]
+            )
+        )
+        res_widths_list = (
+            res_linewidth if isinstance(res_linewidth, list) else [res_linewidth]
+        )
+        res_alphas_list = res_alpha if isinstance(res_alpha, list) else [res_alpha]
+        res_markers_list = res_marker if isinstance(res_marker, list) else [res_marker]
+        res_ecolors_list = res_ecolor if isinstance(res_ecolor, list) else [res_ecolor]
+
+        if res_hline_y is not None:
+            ax_res.axhline(
+                res_hline_y,
+                color=res_hline_color,
+                linestyle=res_hline_style,
+                linewidth=res_hline_width,
+                zorder=2,
+            )
+
+        for i in range(res_num_curves):
+            curr_rx_err = rx_err_list[i] if i < len(rx_err_list) else None
+            curr_ry_err = ry_err_list[i] if i < len(ry_err_list) else None
+
+            curr_rcolor = res_colors[i % len(res_colors)]
+            curr_recolor = res_ecolors_list[i % len(res_ecolors_list)]
+            if curr_recolor is None:
+                curr_recolor = curr_rcolor
+
+            if curr_rx_err is not None or curr_ry_err is not None:
+                ax_res.errorbar(
+                    rx_list[i],
+                    ry_list[i],
+                    xerr=curr_rx_err,
+                    yerr=curr_ry_err,
+                    color=curr_rcolor,
+                    linewidth=res_widths_list[i % len(res_widths_list)],
+                    linestyle=res_styles_list[i % len(res_styles_list)],
+                    alpha=res_alphas_list[i % len(res_alphas_list)],
+                    marker=res_markers_list[i % len(res_markers_list)],
+                    zorder=3,
+                    ecolor=curr_recolor,
+                    elinewidth=res_elinewidth,
+                    capsize=res_capsize,
+                    capthick=res_capthick,
+                )
+            else:
+                ax_res.plot(
+                    rx_list[i],
+                    ry_list[i],
+                    color=curr_rcolor,
+                    linewidth=res_widths_list[i % len(res_widths_list)],
+                    linestyle=res_styles_list[i % len(res_styles_list)],
+                    alpha=res_alphas_list[i % len(res_alphas_list)],
+                    marker=res_markers_list[i % len(res_markers_list)],
+                    zorder=3,
+                )
+
     if title:
         ax.set_title(title, fontsize=title_fontsize, pad=title_pad, fontweight="bold")
 
-    ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=label_pad)
     ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=label_pad)
+    if show_residuals:
+        ax_res.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=label_pad)
+        ax_res.set_ylabel(res_y_label, fontsize=axis_fontsize, labelpad=label_pad)
+        ax.tick_params(labelbottom=False)
+    else:
+        ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=label_pad)
+
     ax.set_xscale(x_scale)
     ax.set_yscale(y_scale)
+    if show_residuals:
+        ax_res.set_yscale(res_y_scale)
 
     if x_lim is not None:
         ax.set_xlim(x_lim)
     if y_lim is not None:
         ax.set_ylim(y_lim)
+    if show_residuals and res_y_lim is not None:
+        ax_res.set_ylim(res_y_lim)
+
+    axes_list = [ax, ax_res] if show_residuals else [ax]
 
     if x_scale == "linear":
-        ax.xaxis.set_minor_locator(AutoMinorLocator())
+        for a in axes_list:
+            a.xaxis.set_minor_locator(AutoMinorLocator())
     if y_scale == "linear":
         ax.yaxis.set_minor_locator(AutoMinorLocator())
+    if show_residuals and res_y_scale == "linear":
+        ax_res.yaxis.set_minor_locator(AutoMinorLocator())
 
-    ax.tick_params(which="major", length=major_tick_length, width=major_tick_width)
-    ax.tick_params(which="minor", length=minor_tick_length, width=minor_tick_width)
+    for a in axes_list:
+        a.tick_params(which="major", length=major_tick_length, width=major_tick_width)
+        a.tick_params(which="minor", length=minor_tick_length, width=minor_tick_width)
 
-    if show_grid:
-        ax.grid(
-            True,
-            linestyle=grid_linestyle,
-            linewidth=grid_linewidth,
-            color=grid_color,
-            alpha=grid_alpha,
-        )
-        ax.set_axisbelow(True)
+        if show_grid:
+            a.grid(
+                True,
+                linestyle=grid_linestyle,
+                linewidth=grid_linewidth,
+                color=grid_color,
+                alpha=grid_alpha,
+            )
+            a.set_axisbelow(True)
+
+        if not show_box:
+            a.set_frame_on(False)
+        elif remove_borders:
+            a.spines["top"].set_visible(False)
+            a.spines["right"].set_visible(False)
+            a.spines["bottom"].set_visible(True)
+            a.spines["left"].set_visible(True)
+            a.spines["bottom"].set_color("black")
+            a.spines["left"].set_color("black")
+        else:
+            for spine in a.spines.values():
+                spine.set_visible(True)
+                spine.set_color("black")
 
     if show_legend:
         handles, labels = ax.get_legend_handles_labels()
@@ -1452,20 +1654,6 @@ def plot(
                 loc="best",
                 edgecolor="black" if legend_box else None,
             )
-
-    if not show_box:
-        ax.set_frame_on(False)
-    elif remove_borders:
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["bottom"].set_visible(True)
-        ax.spines["left"].set_visible(True)
-        ax.spines["bottom"].set_color("black")
-        ax.spines["left"].set_color("black")
-    else:
-        for spine in ax.spines.values():
-            spine.set_visible(True)
-            spine.set_color("black")
 
     plt.tight_layout()
 
