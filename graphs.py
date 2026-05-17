@@ -677,248 +677,6 @@ def multierror(
     return None
 
 
-def elipse(
-    x_data,
-    y_data,
-    z_data,
-    extra_line_x=None,
-    extra_line_y=None,
-    extra_line_label="Linha extra",
-    extra_line_width=1.0,
-    extra_line_style=":",
-    extra_line_color="black",
-    highlight_point=None,
-    ellipse_levels=None,
-    sigma_names=None,
-    show_sigma=True,
-    title=None,
-    x_label="EIXO X",
-    y_label="EIXO Y",
-    show_grid=True,
-    show_box=True,
-    legend_frame=True,
-    legend_alpha=0.5,
-    legend_fontsize=11,
-    colorbar_format="neither",
-    axis_scale="linear",
-    z_scale="linear",
-    colorbar_ticks=None,
-    cmap="viridis_r",
-    title_fontsize=16,
-    axis_fontsize=14,
-    highlight_label="Destaque",
-    highlight_color="red",
-    highlight_marker="*",
-    highlight_size=150,
-    ellipse_styles=["-", ":", ":"],
-    ellipse_colors=["red", "green", "blue"],
-    fig_width=8,
-    fig_height=6,
-    remove_borders=False,
-    show_colorbar=True,
-    colorbar_label=rf"$\chi^2$",
-    heatmap_levels=200,
-    save_fig=False,
-    dpi=600,
-    file_format="pdf",
-    filename="ellipse_graph",
-    show_plot=True,
-):
-    """
-    Gera um mapa de calor (heat map) frequentemente usado para visualização de chi-quadrado e intervalos de confiança.
-
-    Args:
-        x_data (array-like): Matriz de coordenadas X (geralmente gerada por meshgrid).
-        y_data (array-like): Matriz de coordenadas Y (geralmente gerada por meshgrid).
-        z_data (array-like): Matriz de valores Z correspondentes a X e Y.
-        extra_line_x (array-like, optional): Coordenadas X para uma linha adicional sobreposta. Default é None.
-        extra_line_y (array-like, optional): Coordenadas Y para uma linha adicional sobreposta. Default é None.
-        extra_line_label (str, optional): Rótulo da linha extra. Default é "Linha extra".
-        extra_line_width (float, optional): Espessura da linha extra. Default é 1.0.
-        extra_line_style (str, optional): Estilo da linha extra. Default é ":".
-        extra_line_color (str, optional): Cor da linha extra. Default é "black".
-        highlight_point (tuple, optional): Tupla (x, y) marcando o melhor ajuste (best-fit). Default é None.
-        ellipse_levels (list, optional): Valores exatos de Z onde os contornos (elipses) serão desenhados. Default é None.
-        sigma_names (list, optional): Lista de strings nomeando os níveis (ex: ['68%', '95%']). Default é None.
-        show_sigma (bool, optional): Escreve o nome do nível sobre a linha da elipse. Default é True.
-        title (str, optional): Título do gráfico. Default é None.
-        x_label (str, optional): Rótulo do eixo X. Default é "EIXO X".
-        y_label (str, optional): Rótulo do eixo Y. Default é "EIXO Y".
-        show_grid (bool, optional): Ativa a grade do gráfico. Default é True.
-        show_box (bool, optional): Mantém a moldura do gráfico. Default é True.
-        legend_frame (bool, optional): Ativa a caixa ao redor da legenda. Default é True.
-        legend_alpha (float, optional): Transparência do fundo da legenda. Default é 0.5.
-        legend_fontsize (int, optional): Tamanho da fonte da legenda. Default é 11.
-        colorbar_format (str, optional): Formato de extensão da colorbar ('max', 'min', 'both', 'neither'). Default é "neither".
-        axis_scale (str, optional): Escala para os eixos X e Y. Default é "linear".
-        z_scale (str, optional): Escala de cor do eixo Z ('linear' ou 'log'). Default é "linear".
-        colorbar_ticks (int, optional): Limite de marcações na barra de cores. Default é None.
-        cmap (str, optional): Colormap para a superfície de preenchimento. Default é "viridis_r".
-        title_fontsize (int, optional): Tamanho da fonte do título. Default é 16.
-        axis_fontsize (int, optional): Tamanho da fonte dos eixos. Default é 14.
-        highlight_label (str, optional): Nome para o ponto de destaque na legenda. Default é "Destaque".
-        highlight_color (str, optional): Cor do marcador de destaque. Default é "red".
-        highlight_marker (str, optional): Símbolo do marcador de destaque. Default é "*".
-        highlight_size (int, optional): Tamanho do marcador de destaque. Default é 150.
-        ellipse_styles (list, optional): Estilos das elipses traçadas. Default é ["-", ":", ":"].
-        ellipse_colors (list, optional): Cores das elipses traçadas. Default é ["red", "green", "blue"].
-        fig_width (float, optional): Largura da figura. Default é 8.
-        fig_height (float, optional): Altura da figura. Default é 6.
-        remove_borders (bool, optional): Remove as bordas direitas e superiores. Default é False.
-        show_colorbar (bool, optional): Exibe a barra lateral de cores. Default é True.
-        colorbar_label (str, optional): Rótulo da barra de cores. Default é r"$\chi^2$".
-        heatmap_levels (int, optional): Níveis gerados no contourf para gradiente suave. Default é 200.
-        save_fig (bool, optional): Salva o gráfico em arquivo. Default é False.
-        dpi (int, optional): Resolução do arquivo salvo. Default é 600.
-        file_format (str, optional): Formato do arquivo salvo. Default é "pdf".
-        filename (str, optional): Nome do arquivo a ser salvo. Default é "ellipse_graph".
-        show_plot (bool, optional): Exibe o gráfico na tela. Default é True.
-
-    Returns:
-        tuple: (fig, ax) contendo os objetos de figura e eixo da Matplotlib.
-
-    Example:
-        >>> import numpy as np
-        >>> X, Y = np.meshgrid(np.linspace(-3, 3, 100), np.linspace(-3, 3, 100))
-        >>> Z = X**2 + Y**2
-        >>> gp.elipse(X, Y, Z, ellipse_levels=[2.30, 6.18], highlight_point=(0,0), cmap="magma")
-    """
-    plt.rcParams.update(
-        {
-            "text.usetex": False,
-            "font.family": "serif",
-            "font.serif": ["Computer Modern Roman", "DejaVu Serif"],
-            "mathtext.fontset": "cm",
-            "xtick.direction": "in",
-            "ytick.direction": "in",
-            "xtick.top": True,
-            "ytick.right": True,
-            "axes.linewidth": 1.2,
-        }
-    )
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-    if z_scale == "log":
-        Z_min_positive = np.min(z_data[z_data > 0]) if np.any(z_data > 0) else 1e-10
-        norm = LogNorm(vmin=Z_min_positive, vmax=np.max(z_data))
-        levels_cf = np.geomspace(Z_min_positive, np.max(z_data), heatmap_levels)
-    else:
-        norm = None
-        levels_cf = heatmap_levels
-    cf = ax.contourf(
-        x_data,
-        y_data,
-        z_data,
-        levels=levels_cf,
-        cmap=cmap,
-        norm=norm,
-        extend=colorbar_format,
-        antialiased=True,
-    )
-    if ellipse_levels is not None:
-        if sigma_names is None:
-            sigma_names = [rf"{i+1}$\sigma$" for i in range(len(ellipse_levels))]
-        for i, level in enumerate(ellipse_levels):
-            style = ellipse_styles[i % len(ellipse_styles)]
-            color = ellipse_colors[i % len(ellipse_colors)]
-            sigma_name = sigma_names[i % len(sigma_names)]
-            contour = ax.contour(
-                x_data,
-                y_data,
-                z_data,
-                levels=[level],
-                colors=[color],
-                linestyles=style,
-                linewidths=1.8,
-            )
-            if show_sigma:
-                fmt = {level: sigma_name}
-                labels_text = ax.clabel(
-                    contour,
-                    inline=True,
-                    fontsize=axis_fontsize * 0.9,
-                    fmt=fmt,
-                    colors=[color],
-                )
-                for text in labels_text:
-                    text.set_fontweight("bold")
-    if extra_line_x is not None and extra_line_y is not None:
-        ax.plot(
-            extra_line_x,
-            extra_line_y,
-            color=extra_line_color,
-            linestyle=extra_line_style,
-            linewidth=extra_line_width,
-            label=extra_line_label,
-            zorder=4,
-        )
-    if highlight_point is not None:
-        ax.scatter(
-            highlight_point[0],
-            highlight_point[1],
-            color=highlight_color,
-            marker=highlight_marker,
-            s=highlight_size,
-            label=f"{highlight_label}\n({highlight_point[0]:.3f}, {highlight_point[1]:.3f})",
-            zorder=5,
-        )
-    if show_colorbar:
-        cbar = fig.colorbar(cf, ax=ax, pad=0.02)
-        cbar.set_label(colorbar_label, fontsize=axis_fontsize)
-        cbar.ax.tick_params(labelsize=axis_fontsize * 0.8)
-        cbar.outline.set_linewidth(1.2)
-        if z_scale == "log":
-            cbar.ax.yaxis.set_major_formatter(LogFormatterMathtext())
-            if colorbar_ticks is not None:
-                cbar.ax.yaxis.set_major_locator(
-                    LogLocator(base=10.0, numticks=colorbar_ticks)
-                )
-            else:
-                cbar.ax.yaxis.set_minor_locator(
-                    LogLocator(base=10.0, subs=np.arange(2, 10) * 0.1)
-                )
-        else:
-            if colorbar_ticks is not None:
-                cbar.ax.yaxis.set_major_locator(MaxNLocator(colorbar_ticks))
-    if title:
-        ax.set_title(title, fontsize=title_fontsize, pad=15)
-    ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=10)
-    ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=10)
-    ax.set_xscale(axis_scale)
-    ax.set_yscale(axis_scale)
-    ax.minorticks_on()
-    ax.tick_params(which="minor", direction="in", top=True, right=True)
-    if highlight_point is not None or (
-        extra_line_x is not None and extra_line_y is not None
-    ):
-        ax.legend(
-            frameon=legend_frame,
-            facecolor="white",
-            framealpha=legend_alpha,
-            edgecolor="#333333",
-            fontsize=legend_fontsize,
-            loc="best",
-        )
-    if show_grid:
-        ax.grid(True, linestyle=":", linewidth=0.5, color="black", alpha=0.15)
-        ax.set_axisbelow(False)
-    if not show_box:
-        ax.set_frame_on(False)
-    elif remove_borders:
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-    ax.set_xlim(np.min(x_data), np.max(x_data))
-    ax.set_ylim(np.min(y_data), np.max(y_data))
-    plt.tight_layout()
-    if save_fig:
-        if not os.path.exists("figures"):
-            os.makedirs("figures")
-        filepath = f"figures/{filename}.{file_format}"
-        plt.savefig(filepath, dpi=dpi, bbox_inches="tight")
-    if show_plot:
-        plt.show()
-    return fig, ax
-
-
 def basicstyle(
     x_data,
     y_data,
@@ -1722,3 +1480,344 @@ def plot(
         plt.close(fig)
 
     return None
+
+
+def elipse(
+    x_data,
+    y_data,
+    z_data,
+    extra_line_x=None,
+    extra_line_y=None,
+    extra_line_label="Linha extra",
+    extra_line_width=1.0,
+    extra_line_style=":",
+    extra_line_color="black",
+    highlight_point=None,
+    ellipse_levels=None,
+    sigma_names=None,
+    show_sigma=True,
+    title=None,
+    x_label="EIXO X",
+    y_label="EIXO Y",
+    x_scale="linear",
+    y_scale="linear",
+    z_scale="linear",
+    show_grid=True,
+    show_box=True,
+    remove_borders=False,
+    legend_frame=True,
+    legend_alpha=0.5,
+    legend_fontsize=11,
+    legend_facecolor="white",
+    legend_edgecolor="#333333",
+    colorbar_format="neither",
+    colorbar_ticks=None,
+    cmap="viridis_r",
+    title_fontsize=16,
+    axis_fontsize=14,
+    highlight_label="Destaque",
+    highlight_color="red",
+    highlight_marker="*",
+    highlight_size=150,
+    ellipse_styles=["-", ":", ":"],
+    ellipse_colors=["red", "green", "blue"],
+    ellipse_linewidths=1.8,
+    sigma_fontsize=None,
+    sigma_fontweight="bold",
+    fig_width=8,
+    fig_height=6,
+    figure_dpi=100,
+    show_colorbar=True,
+    colorbar_label=rf"$\chi^2$",
+    colorbar_pad=0.02,
+    colorbar_tick_labelsize=None,
+    colorbar_outline_width=1.2,
+    heatmap_levels=200,
+    cf_antialiased=True,
+    z_min_default=1e-10,
+    log_locator_base=10.0,
+    log_locator_subs=None,
+    title_pad=15,
+    label_pad=10,
+    font_serif=["Computer Modern Roman", "DejaVu Serif"],
+    mathtext_fontset="cm",
+    axes_linewidth=1.2,
+    grid_linestyle=":",
+    grid_linewidth=0.5,
+    grid_color="black",
+    grid_alpha=0.15,
+    grid_axisbelow=False,
+    save_fig=False,
+    dpi=600,
+    file_format="pdf",
+    filename="ellipse_graph",
+    show_plot=True,
+):
+    """
+    Gera um mapa de calor (heat map) frequentemente usado para visualização de chi-quadrado e intervalos de confiança.
+
+    Args:
+        x_data (array-like): Matriz de coordenadas X.
+        y_data (array-like): Matriz de coordenadas Y.
+        z_data (array-like): Matriz de valores Z correspondentes a X e Y.
+        extra_line_x (array-like, optional): Coordenadas X para uma linha extra.
+        extra_line_y (array-like, optional): Coordenadas Y para uma linha extra.
+        extra_line_label (str, optional): Rótulo da linha extra.
+        extra_line_width (float, optional): Espessura da linha extra.
+        extra_line_style (str, optional): Estilo da linha extra.
+        extra_line_color (str, optional): Cor da linha extra.
+        highlight_point (tuple, optional): Tupla (x, y) marcando um ponto de destaque.
+        ellipse_levels (list, optional): Valores exatos de Z onde os contornos serão desenhados.
+        sigma_names (list, optional): Lista de strings nomeando os níveis.
+        show_sigma (bool, optional): Escreve o nome do nível sobre a linha da elipse.
+        title (str, optional): Título do gráfico.
+        x_label (str, optional): Rótulo do eixo X.
+        y_label (str, optional): Rótulo do eixo Y.
+        x_scale (str, optional): Escala para o eixo X.
+        y_scale (str, optional): Escala para o eixo Y.
+        z_scale (str, optional): Escala de cor do eixo Z.
+        show_grid (bool, optional): Ativa a grade do gráfico.
+        show_box (bool, optional): Mantém a moldura do gráfico.
+        remove_borders (bool, optional): Remove as bordas direitas e superiores.
+        legend_frame (bool, optional): Ativa a caixa ao redor da legenda.
+        legend_alpha (float, optional): Transparência do fundo da legenda.
+        legend_fontsize (int, optional): Tamanho da fonte da legenda.
+        legend_facecolor (str, optional): Cor de fundo da legenda.
+        legend_edgecolor (str, optional): Cor da borda da legenda.
+        colorbar_format (str, optional): Formato de extensão da colorbar ('max', 'min', 'both', 'neither').
+        colorbar_ticks (int, optional): Limite de marcações na barra de cores.
+        cmap (str, optional): Colormap para a superfície de preenchimento.
+        title_fontsize (int, optional): Tamanho da fonte do título.
+        axis_fontsize (int, optional): Tamanho da fonte dos eixos.
+        highlight_label (str, optional): Nome para o ponto de destaque na legenda.
+        highlight_color (str, optional): Cor do marcador de destaque.
+        highlight_marker (str, optional): Símbolo do marcador de destaque.
+        highlight_size (int, optional): Tamanho do marcador de destaque.
+        ellipse_styles (list, optional): Estilos das elipses traçadas.
+        ellipse_colors (list, optional): Cores das elipses traçadas.
+        ellipse_linewidths (float, optional): Espessura das linhas das elipses.
+        sigma_fontsize (float, optional): Tamanho da fonte dos nomes dos sigmas.
+        sigma_fontweight (str, optional): Peso da fonte dos nomes dos sigmas.
+        fig_width (float, optional): Largura da figura.
+        fig_height (float, optional): Altura da figura.
+        figure_dpi (int, optional): Resolução de exibição da figura.
+        show_colorbar (bool, optional): Exibe a barra lateral de cores.
+        colorbar_label (str, optional): Rótulo da barra de cores.
+        colorbar_pad (float, optional): Espaçamento entre o gráfico e a barra de cores.
+        colorbar_tick_labelsize (float, optional): Tamanho da fonte dos números na barra de cores.
+        colorbar_outline_width (float, optional): Espessura da borda da barra de cores.
+        heatmap_levels (int, optional): Níveis gerados no contourf para gradiente suave.
+        cf_antialiased (bool, optional): Suavização do mapa de preenchimento.
+        z_min_default (float, optional): Mínimo padrão para evitar erros na escala log.
+        log_locator_base (float, optional): Base logarítmica da barra de cores.
+        log_locator_subs (array-like, optional): Sub-marcações da barra de cores em log.
+        title_pad (float, optional): Espaçamento do título.
+        label_pad (float, optional): Espaçamento dos rótulos dos eixos.
+        font_serif (list, optional): Fontes serifadas utilizadas.
+        mathtext_fontset (str, optional): Set de fontes matemáticas.
+        axes_linewidth (float, optional): Espessura das bordas dos eixos principais.
+        grid_linestyle (str, optional): Estilo da linha da grade.
+        grid_linewidth (float, optional): Espessura da linha da grade.
+        grid_color (str, optional): Cor da grade.
+        grid_alpha (float, optional): Transparência da grade.
+        grid_axisbelow (bool, optional): Coloca a grade atrás dos dados.
+        save_fig (bool, optional): Salva o gráfico em arquivo.
+        dpi (int, optional): Resolução do arquivo salvo.
+        file_format (str, optional): Formato do arquivo salvo.
+        filename (str, optional): Nome do arquivo a ser salvo (com suporte a subpastas).
+        show_plot (bool, optional): Exibe o gráfico na tela.
+
+    Returns:
+        tuple: (fig, ax) contendo os objetos de figura e eixo da Matplotlib.
+    """
+    plt.rcParams.update(
+        {
+            "text.usetex": False,
+            "font.family": "serif",
+            "font.serif": font_serif,
+            "mathtext.fontset": mathtext_fontset,
+            "xtick.direction": "in",
+            "ytick.direction": "in",
+            "xtick.top": True,
+            "ytick.right": True,
+            "axes.linewidth": axes_linewidth,
+        }
+    )
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=figure_dpi)
+
+    if z_scale == "log":
+        Z_min_positive = (
+            np.min(z_data[z_data > 0]) if np.any(z_data > 0) else z_min_default
+        )
+        norm = LogNorm(vmin=Z_min_positive, vmax=np.max(z_data))
+        levels_cf = np.geomspace(Z_min_positive, np.max(z_data), heatmap_levels)
+    else:
+        norm = None
+        levels_cf = heatmap_levels
+
+    cf = ax.contourf(
+        x_data,
+        y_data,
+        z_data,
+        levels=levels_cf,
+        cmap=cmap,
+        norm=norm,
+        extend=colorbar_format,
+        antialiased=cf_antialiased,
+    )
+
+    if ellipse_levels is not None:
+        styles_list = (
+            [ellipse_styles] if isinstance(ellipse_styles, str) else ellipse_styles
+        )
+        colors_list = (
+            [ellipse_colors] if isinstance(ellipse_colors, str) else ellipse_colors
+        )
+
+        if sigma_names is None:
+            s_names = [rf"{i+1}$\sigma$" for i in range(len(ellipse_levels))]
+        else:
+            s_names = [sigma_names] if isinstance(sigma_names, str) else sigma_names
+
+        final_sigma_fontsize = (
+            sigma_fontsize if sigma_fontsize is not None else axis_fontsize * 0.9
+        )
+
+        for i, level in enumerate(ellipse_levels):
+            style = styles_list[i % len(styles_list)]
+            color = colors_list[i % len(colors_list)]
+            sigma_name = s_names[i % len(s_names)]
+
+            contour = ax.contour(
+                x_data,
+                y_data,
+                z_data,
+                levels=[level],
+                colors=[color],
+                linestyles=style,
+                linewidths=ellipse_linewidths,
+            )
+
+            if show_sigma:
+                fmt = {level: sigma_name}
+                labels_text = ax.clabel(
+                    contour,
+                    inline=True,
+                    fontsize=final_sigma_fontsize,
+                    fmt=fmt,
+                    colors=[color],
+                )
+                for text in labels_text:
+                    text.set_fontweight(sigma_fontweight)
+
+    if extra_line_x is not None and extra_line_y is not None:
+        ax.plot(
+            extra_line_x,
+            extra_line_y,
+            color=extra_line_color,
+            linestyle=extra_line_style,
+            linewidth=extra_line_width,
+            label=extra_line_label,
+            zorder=4,
+        )
+
+    if highlight_point is not None:
+        ax.scatter(
+            highlight_point[0],
+            highlight_point[1],
+            color=highlight_color,
+            marker=highlight_marker,
+            s=highlight_size,
+            label=f"{highlight_label}\n({highlight_point[0]:.3f}, {highlight_point[1]:.3f})",
+            zorder=5,
+        )
+
+    if show_colorbar:
+        cbar = fig.colorbar(cf, ax=ax, pad=colorbar_pad)
+        cbar.set_label(colorbar_label, fontsize=axis_fontsize)
+
+        final_cbar_labelsize = (
+            colorbar_tick_labelsize
+            if colorbar_tick_labelsize is not None
+            else axis_fontsize * 0.8
+        )
+        cbar.ax.tick_params(labelsize=final_cbar_labelsize)
+        cbar.outline.set_linewidth(colorbar_outline_width)
+
+        if z_scale == "log":
+            cbar.ax.yaxis.set_major_formatter(LogFormatterMathtext())
+            if colorbar_ticks is not None:
+                cbar.ax.yaxis.set_major_locator(
+                    LogLocator(base=log_locator_base, numticks=colorbar_ticks)
+                )
+            else:
+                subs_arr = (
+                    log_locator_subs
+                    if log_locator_subs is not None
+                    else np.arange(2, 10) * 0.1
+                )
+                cbar.ax.yaxis.set_minor_locator(
+                    LogLocator(base=log_locator_base, subs=subs_arr)
+                )
+        else:
+            if colorbar_ticks is not None:
+                cbar.ax.yaxis.set_major_locator(MaxNLocator(colorbar_ticks))
+
+    if title:
+        ax.set_title(title, fontsize=title_fontsize, pad=title_pad)
+
+    ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=label_pad)
+    ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=label_pad)
+    ax.set_xscale(x_scale)
+    ax.set_yscale(y_scale)
+
+    ax.minorticks_on()
+    ax.tick_params(which="minor", direction="in", top=True, right=True)
+
+    if highlight_point is not None or (
+        extra_line_x is not None and extra_line_y is not None
+    ):
+        ax.legend(
+            frameon=legend_frame,
+            facecolor=legend_facecolor,
+            framealpha=legend_alpha,
+            edgecolor=legend_edgecolor,
+            fontsize=legend_fontsize,
+            loc="best",
+        )
+
+    if show_grid:
+        ax.grid(
+            True,
+            linestyle=grid_linestyle,
+            linewidth=grid_linewidth,
+            color=grid_color,
+            alpha=grid_alpha,
+        )
+        ax.set_axisbelow(grid_axisbelow)
+
+    if not show_box:
+        ax.set_frame_on(False)
+    elif remove_borders:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(True)
+        ax.spines["left"].set_visible(True)
+        ax.spines["bottom"].set_color("black")
+        ax.spines["left"].set_color("black")
+
+    ax.set_xlim(np.min(x_data), np.max(x_data))
+    ax.set_ylim(np.min(y_data), np.max(y_data))
+
+    plt.tight_layout()
+
+    if save_fig:
+        filepath = f"figures/{filename}.{file_format}"
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        plt.savefig(filepath, dpi=dpi, bbox_inches="tight")
+
+    if show_plot:
+        plt.show()
+
+    return fig, ax
