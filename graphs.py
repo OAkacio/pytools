@@ -1112,6 +1112,7 @@ def plot(
     linestyle="cycle",
     alpha=0.8,
     marker=None,
+    markersize=6.0,
     ecolor=None,
     elinewidth=1.5,
     capsize=3.0,
@@ -1133,6 +1134,7 @@ def plot(
     legend_title=None,
     legend_box=False,
     legend_fontsize=None,
+    legend_loc="best",
     title_fontsize=16,
     axis_fontsize=12,
     title_pad=15,
@@ -1161,6 +1163,7 @@ def plot(
     res_linestyle="",
     res_alpha=0.8,
     res_marker="o",
+    res_markersize=6.0,
     res_ecolor=None,
     res_elinewidth=1.5,
     res_capsize=3.0,
@@ -1202,6 +1205,7 @@ def plot(
         linestyle (str/list, optional): Estilo(s) das linhas principais.
         alpha (float/list, optional): Opacidade(s) das curvas principais.
         marker (str/list, optional): Marcador(es) das curvas principais.
+        markersize (float/list, optional): Tamanho(s) dos marcadores principais.
         ecolor (str/list, optional): Cor das barras de erro principais.
         elinewidth (float, optional): Espessura da barra de erro principal.
         capsize (float, optional): Tamanho dos traços do erro principal.
@@ -1223,6 +1227,7 @@ def plot(
         legend_title (str, optional): Título da legenda principal.
         legend_box (bool, optional): Borda da legenda principal.
         legend_fontsize (float, optional): Tamanho da fonte da legenda principal.
+        legend_loc (str, optional): Posição da legenda ('best', 'upper right', etc).
         title_fontsize (int, optional): Tamanho do título.
         axis_fontsize (int, optional): Tamanho dos eixos.
         title_pad (float, optional): Espaçamento do título.
@@ -1251,6 +1256,7 @@ def plot(
         res_linestyle (str/list, optional): Estilo da linha dos resíduos.
         res_alpha (float/list, optional): Opacidade dos resíduos.
         res_marker (str/list, optional): Marcador dos resíduos.
+        res_markersize (float/list, optional): Tamanho dos marcadores dos resíduos.
         res_ecolor (str/list, optional): Cor das barras de erro dos resíduos.
         res_elinewidth (float, optional): Espessura das barras de erro dos resíduos.
         res_capsize (float, optional): Caps das barras de erro dos resíduos.
@@ -1396,6 +1402,7 @@ def plot(
     widths_list = linewidth if isinstance(linewidth, list) else [linewidth]
     alphas_list = alpha if isinstance(alpha, list) else [alpha]
     markers_list = marker if isinstance(marker, list) else [marker]
+    ms_list = markersize if isinstance(markersize, list) else [markersize]
     ecolors_list = ecolor if isinstance(ecolor, list) else [ecolor]
     c_names = [curve_names] if isinstance(curve_names, str) else curve_names
 
@@ -1455,6 +1462,7 @@ def plot(
         curr_width = widths_list[i % len(widths_list)]
         curr_alpha = alphas_list[i % len(alphas_list)]
         curr_marker = markers_list[i % len(markers_list)]
+        curr_ms = ms_list[i % len(ms_list)]
 
         curr_ecolor = ecolors_list[i % len(ecolors_list)]
         if curr_ecolor is None:
@@ -1471,6 +1479,7 @@ def plot(
                 linestyle=curr_style,
                 alpha=curr_alpha,
                 marker=curr_marker,
+                markersize=curr_ms,
                 zorder=3,
                 label=c_label,
                 ecolor=curr_ecolor,
@@ -1487,6 +1496,7 @@ def plot(
                 linestyle=curr_style,
                 alpha=curr_alpha,
                 marker=curr_marker,
+                markersize=curr_ms,
                 zorder=3,
                 label=c_label,
             )
@@ -1530,6 +1540,9 @@ def plot(
         )
         res_alphas_list = res_alpha if isinstance(res_alpha, list) else [res_alpha]
         res_markers_list = res_marker if isinstance(res_marker, list) else [res_marker]
+        res_ms_list = (
+            res_markersize if isinstance(res_markersize, list) else [res_markersize]
+        )
         res_ecolors_list = res_ecolor if isinstance(res_ecolor, list) else [res_ecolor]
 
         if res_hline_y is not None:
@@ -1561,6 +1574,7 @@ def plot(
                     linestyle=res_styles_list[i % len(res_styles_list)],
                     alpha=res_alphas_list[i % len(res_alphas_list)],
                     marker=res_markers_list[i % len(res_markers_list)],
+                    markersize=res_ms_list[i % len(res_ms_list)],
                     zorder=3,
                     ecolor=curr_recolor,
                     elinewidth=res_elinewidth,
@@ -1576,6 +1590,7 @@ def plot(
                     linestyle=res_styles_list[i % len(res_styles_list)],
                     alpha=res_alphas_list[i % len(res_alphas_list)],
                     marker=res_markers_list[i % len(res_markers_list)],
+                    markersize=res_ms_list[i % len(res_ms_list)],
                     zorder=3,
                 )
 
@@ -1651,7 +1666,7 @@ def plot(
                 frameon=legend_box,
                 fontsize=final_legend_fontsize,
                 title_fontsize=axis_fontsize,
-                loc="best",
+                loc=legend_loc,
                 edgecolor="black" if legend_box else None,
             )
 
