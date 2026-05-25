@@ -1223,11 +1223,11 @@ def plot(
         elinewidth (float, optional): Espessura da barra de erro principal.
         capsize (float, optional): Tamanho dos traços do erro principal.
         capthick (float, optional): Espessura dos traços do erro principal.
-        highlight_point (tuple, optional): Coordenadas de um ponto de destaque.
-        highlight_color (str, optional): Cor do destaque.
-        highlight_marker (str, optional): Marcador do destaque.
-        highlight_size (int, optional): Tamanho do destaque.
-        highlight_label (str, optional): Rótulo do destaque.
+        highlight_point (tuple/list, optional): Coordenadas de um ponto de destaque ou lista de pontos.
+        highlight_color (str/list, optional): Cor(es) do(s) destaque(s).
+        highlight_marker (str/list, optional): Marcador(es) do(s) destaque(s).
+        highlight_size (int/list, optional): Tamanho(s) do(s) destaque(s).
+        highlight_label (str/list, optional): Rótulo(s) do(s) destaque(s).
         sigma_intervals (list, optional): Intervalos de regiões de confiança.
         sigma_colors (tuple/list, optional): Cores de preenchimento dos sigmas.
         sigma_line_colors (tuple/list, optional): Cores das linhas dos sigmas.
@@ -1527,16 +1527,41 @@ def plot(
             )
 
     if highlight_point is not None:
-        h_label = highlight_label if highlight_label else None
-        ax.scatter(
-            highlight_point[0],
-            highlight_point[1],
-            color=highlight_color,
-            marker=highlight_marker,
-            s=highlight_size,
-            label=h_label,
-            zorder=5,
+        if (
+            (isinstance(highlight_point, tuple) or isinstance(highlight_point, list))
+            and len(highlight_point) == 2
+            and not isinstance(highlight_point[0], (list, tuple))
+        ):
+            h_pts = [highlight_point]
+        else:
+            h_pts = highlight_point
+
+        h_cols = (
+            highlight_color if isinstance(highlight_color, list) else [highlight_color]
         )
+        h_mrks = (
+            highlight_marker
+            if isinstance(highlight_marker, list)
+            else [highlight_marker]
+        )
+        h_szs = highlight_size if isinstance(highlight_size, list) else [highlight_size]
+        h_labs = (
+            highlight_label
+            if isinstance(highlight_label, list)
+            else [highlight_label] if highlight_label else []
+        )
+
+        for idx, pt in enumerate(h_pts):
+            c_lab = h_labs[idx % len(h_labs)] if h_labs else None
+            ax.scatter(
+                pt[0],
+                pt[1],
+                color=h_cols[idx % len(h_cols)],
+                marker=h_mrks[idx % len(h_mrks)],
+                s=h_szs[idx % len(h_szs)],
+                label=c_lab,
+                zorder=5,
+            )
 
     if show_residuals:
         res_num_curves = len(rx_list)
