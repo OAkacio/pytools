@@ -1130,6 +1130,18 @@ def plot(
     sigma_alpha=0.6,
     sigma_linewidth=1.5,
     sigma_linestyle="--",
+    vlines=None,
+    v_colors="black",
+    v_linewidth=1.5,
+    v_linestyle="--",
+    v_alpha=0.8,
+    v_labels=None,
+    hlines=None,
+    h_colors="black",
+    h_linewidth=1.5,
+    h_linestyle="--",
+    h_alpha=0.8,
+    h_labels=None,
     show_legend=True,
     legend_title=None,
     legend_box=False,
@@ -1182,7 +1194,8 @@ def plot(
 ):
     """
     Gera um gráfico 2D unificado com personalização completa, incluindo a opção de adicionar
-    um painel inferior para exibir N resíduos atrelados ao eixo X principal.
+    um painel inferior para exibir N resíduos atrelados ao eixo X principal e adicionar
+    linhas de referência horizontais e verticais.
 
     Args:
         x_data (array-like/list): Dados do eixo X principal.
@@ -1223,6 +1236,18 @@ def plot(
         sigma_alpha (float, optional): Opacidade dos sigmas.
         sigma_linewidth (float, optional): Espessura da linha dos sigmas.
         sigma_linestyle (str, optional): Estilo da linha dos sigmas.
+        vlines (list, optional): Lista de coordenadas X para retas verticais.
+        v_colors (str/list, optional): Cor(es) das retas verticais.
+        v_linewidth (float/list, optional): Espessura(s) das retas verticais.
+        v_linestyle (str/list, optional): Estilo(s) das retas verticais.
+        v_alpha (float/list, optional): Opacidade(s) das retas verticais.
+        v_labels (str/list, optional): Rótulo(s) das retas verticais.
+        hlines (list, optional): Lista de coordenadas Y para retas horizontais.
+        h_colors (str/list, optional): Cor(es) das retas horizontais.
+        h_linewidth (float/list, optional): Espessura(s) das retas horizontais.
+        h_linestyle (str/list, optional): Estilo(s) das retas horizontais.
+        h_alpha (float/list, optional): Opacidade(s) das retas horizontais.
+        h_labels (str/list, optional): Rótulo(s) das retas horizontais.
         show_legend (bool, optional): Ativa a legenda do gráfico principal.
         legend_title (str, optional): Título da legenda principal.
         legend_box (bool, optional): Borda da legenda principal.
@@ -1654,6 +1679,51 @@ def plot(
             for spine in a.spines.values():
                 spine.set_visible(True)
                 spine.set_color("black")
+
+    if vlines is not None:
+        v_locs = vlines if isinstance(vlines, list) else [vlines]
+        v_cols = v_colors if isinstance(v_colors, list) else [v_colors]
+        v_lws = v_linewidth if isinstance(v_linewidth, list) else [v_linewidth]
+        v_lss = v_linestyle if isinstance(v_linestyle, list) else [v_linestyle]
+        v_alps = v_alpha if isinstance(v_alpha, list) else [v_alpha]
+        v_labs = (
+            v_labels if isinstance(v_labels, list) else [v_labels] if v_labels else []
+        )
+
+        for idx, vx in enumerate(v_locs):
+            for a in axes_list:
+                c_lab = v_labs[idx % len(v_labs)] if v_labs and a == ax else None
+                a.axvline(
+                    x=vx,
+                    color=v_cols[idx % len(v_cols)],
+                    linewidth=v_lws[idx % len(v_lws)],
+                    linestyle=v_lss[idx % len(v_lss)],
+                    alpha=v_alps[idx % len(v_alps)],
+                    label=c_lab,
+                    zorder=2,
+                )
+
+    if hlines is not None:
+        h_locs = hlines if isinstance(hlines, list) else [hlines]
+        h_cols = h_colors if isinstance(h_colors, list) else [h_colors]
+        h_lws = h_linewidth if isinstance(h_linewidth, list) else [h_linewidth]
+        h_lss = h_linestyle if isinstance(h_linestyle, list) else [h_linestyle]
+        h_alps = h_alpha if isinstance(h_alpha, list) else [h_alpha]
+        h_labs = (
+            h_labels if isinstance(h_labels, list) else [h_labels] if h_labels else []
+        )
+
+        for idx, hy in enumerate(h_locs):
+            c_lab = h_labs[idx % len(h_labs)] if h_labs else None
+            ax.axhline(
+                y=hy,
+                color=h_cols[idx % len(h_cols)],
+                linewidth=h_lws[idx % len(h_lws)],
+                linestyle=h_lss[idx % len(h_lss)],
+                alpha=h_alps[idx % len(h_alps)],
+                label=c_lab,
+                zorder=2,
+            )
 
     if show_legend:
         handles, labels = ax.get_legend_handles_labels()
