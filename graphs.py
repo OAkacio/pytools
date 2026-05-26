@@ -1125,7 +1125,7 @@ def plot(
     sigma_intervals=None,
     sigma_colors=("#ccebc5", "#fff2ae", "#fbb4ae"),
     sigma_line_colors=("forestgreen", "orange", "lightcoral"),
-    sigma_labels=("1σ (68.3%)", "2σ (95.4%)", "3σ (99.7%)"),
+    sigma_labels=("1σ", "2σ", "3σ"),
     show_sigma_lines=True,
     sigma_alpha=0.6,
     sigma_linewidth=1.5,
@@ -1162,6 +1162,7 @@ def plot(
     major_tick_width=1.2,
     minor_tick_length=3.0,
     minor_tick_width=1.0,
+    tick_direction="out",
     show_residuals=False,
     res_x_data=None,
     res_y_data=None,
@@ -1268,6 +1269,7 @@ def plot(
         major_tick_width (float, optional): Espessura das marcações principais.
         minor_tick_length (float, optional): Comprimento das marcações menores.
         minor_tick_width (float, optional): Espessura das marcações menores.
+        tick_direction (str, optional): Direção das marcações dos eixos ('in' ou 'out'). Default é 'out'.
         show_residuals (bool, optional): Ativa o painel de resíduos. Default é False.
         res_x_data (array-like/list, optional): X dos resíduos (se None, usa x_data).
         res_y_data (array-like/list, optional): Y dos resíduos. Requerido se show_residuals for True.
@@ -1306,8 +1308,8 @@ def plot(
             "font.family": "serif",
             "mathtext.fontset": "dejavuserif",
             "axes.linewidth": 1.2,
-            "xtick.direction": "in",
-            "ytick.direction": "in",
+            "xtick.direction": tick_direction,
+            "ytick.direction": tick_direction,
             "xtick.top": True,
             "ytick.right": True,
             "xtick.labelsize": axis_fontsize - 2,
