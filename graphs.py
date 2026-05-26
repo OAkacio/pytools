@@ -1162,7 +1162,9 @@ def plot(
     major_tick_width=1.2,
     minor_tick_length=3.0,
     minor_tick_width=1.0,
+    top_right_ticks=True,
     tick_direction="out",
+    block_tick=False,
     show_residuals=False,
     res_x_data=None,
     res_y_data=None,
@@ -1269,7 +1271,9 @@ def plot(
         major_tick_width (float, optional): Espessura das marcações principais.
         minor_tick_length (float, optional): Comprimento das marcações menores.
         minor_tick_width (float, optional): Espessura das marcações menores.
+        top_right_ticks (bool, optional): Marcações no canto superior e direito. Default é True.
         tick_direction (str, optional): Direção das marcações dos eixos ('in' ou 'out'). Default é 'out'.
+        block_tick (bool, optional): Impede a formatação automática dos eixos em escalas como notação científica ou com offset, forçando a exibição padrão dos números. Default é False.
         show_residuals (bool, optional): Ativa o painel de resíduos. Default é False.
         res_x_data (array-like/list, optional): X dos resíduos (se None, usa x_data).
         res_y_data (array-like/list, optional): Y dos resíduos. Requerido se show_residuals for True.
@@ -1310,8 +1314,8 @@ def plot(
             "axes.linewidth": 1.2,
             "xtick.direction": tick_direction,
             "ytick.direction": tick_direction,
-            "xtick.top": True,
-            "ytick.right": True,
+            "xtick.top": top_right_ticks,
+            "ytick.right": top_right_ticks,
             "xtick.labelsize": axis_fontsize - 2,
             "ytick.labelsize": axis_fontsize - 2,
             "legend.frameon": legend_box,
@@ -1680,6 +1684,18 @@ def plot(
         ax_res.yaxis.set_minor_locator(AutoMinorLocator())
 
     for a in axes_list:
+        if block_tick:
+            from matplotlib.ticker import ScalarFormatter
+            formatter_x = ScalarFormatter()
+            formatter_x.set_scientific(False)
+            formatter_x.set_useOffset(False)
+            a.xaxis.set_major_formatter(formatter_x)
+
+            formatter_y = ScalarFormatter()
+            formatter_y.set_scientific(False)
+            formatter_y.set_useOffset(False)
+            a.yaxis.set_major_formatter(formatter_y)
+
         a.tick_params(which="major", length=major_tick_length, width=major_tick_width)
         a.tick_params(which="minor", length=minor_tick_length, width=minor_tick_width)
 
@@ -1771,6 +1787,7 @@ def plot(
 
     if save_fig:
         filepath = f"figures/{filename}.{file_format}"
+        import os
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor="white")
 
