@@ -1107,6 +1107,7 @@ def plot(
     show_grid=False,
     show_box=True,
     remove_borders=False,
+    background_color="white",
     color_style="random",
     linewidth=2.0,
     linestyle="cycle",
@@ -1194,6 +1195,7 @@ def plot(
     file_format="pdf",
     filename="plot_graph",
     show_plot=True,
+    theme=None,
 ):
     """
     Gera um gráfico 2D unificado com personalização completa, incluindo a opção de adicionar
@@ -1216,6 +1218,7 @@ def plot(
         show_grid (bool, optional): Ativa grade para os painéis.
         show_box (bool, optional): Mantém caixa dos gráficos.
         remove_borders (bool, optional): Remove bordas superior e direita.
+        background_color (str, optional): Cor de fundo da figura e dos eixos.
         color_style (str/list, optional): Estilos de cor das curvas principais.
         linewidth (float/list, optional): Espessura(s) das linhas principais.
         linestyle (str/list, optional): Estilo(s) das linhas principais.
@@ -1303,10 +1306,20 @@ def plot(
         file_format (str, optional): Formato salvo.
         filename (str, optional): Nome do arquivo com suporte a subdiretórios.
         show_plot (bool, optional): Exibe a interface gráfica.
+        theme (str, optional): Tema do gráfico ('dark' ou None).
 
     Returns:
         None
     """
+    if theme == "dark":
+        text_color = "#ABB2BF"
+        edge_color = "#ABB2BF"
+        if background_color == "white":
+            background_color = "#242424"
+    else:
+        text_color = "black"
+        edge_color = "black"
+
     plt.rcParams.update(
         {
             "font.family": "serif",
@@ -1319,6 +1332,10 @@ def plot(
             "xtick.labelsize": axis_fontsize - 2,
             "ytick.labelsize": axis_fontsize - 2,
             "legend.frameon": legend_box,
+            "text.color": text_color,
+            "axes.labelcolor": text_color,
+            "xtick.color": text_color,
+            "ytick.color": text_color,
         }
     )
 
@@ -1404,9 +1421,13 @@ def plot(
             sharex=True,
             gridspec_kw={"height_ratios": gridspec_height_ratios, "hspace": hspace},
         )
+        ax_res.set_facecolor(background_color)
     else:
         fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=figure_dpi)
         ax_res = None
+
+    fig.patch.set_facecolor(background_color)
+    ax.set_facecolor(background_color)
 
     num_curves = len(x_list)
 
@@ -1686,6 +1707,7 @@ def plot(
     for a in axes_list:
         if block_tick:
             from matplotlib.ticker import ScalarFormatter
+
             formatter_x = ScalarFormatter()
             formatter_x.set_scientific(False)
             formatter_x.set_useOffset(False)
@@ -1716,12 +1738,12 @@ def plot(
             a.spines["right"].set_visible(False)
             a.spines["bottom"].set_visible(True)
             a.spines["left"].set_visible(True)
-            a.spines["bottom"].set_color("black")
-            a.spines["left"].set_color("black")
+            a.spines["bottom"].set_color(edge_color)
+            a.spines["left"].set_color(edge_color)
         else:
             for spine in a.spines.values():
                 spine.set_visible(True)
-                spine.set_color("black")
+                spine.set_color(edge_color)
 
     if vlines is not None:
         v_locs = vlines if isinstance(vlines, list) else [vlines]
@@ -1780,7 +1802,7 @@ def plot(
                 fontsize=final_legend_fontsize,
                 title_fontsize=axis_fontsize,
                 loc=legend_loc,
-                edgecolor="black" if legend_box else None,
+                edgecolor=edge_color if legend_box else None,
             )
 
     plt.tight_layout()
@@ -1788,8 +1810,9 @@ def plot(
     if save_fig:
         filepath = f"figures/{filename}.{file_format}"
         import os
+
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor="white")
+        plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor=background_color)
 
     if show_plot:
         plt.show()
