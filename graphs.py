@@ -1816,10 +1816,8 @@ def plot(
 
     if show_plot:
         plt.show()
-    else:
-        plt.close(fig)
 
-    return None
+    return fig
 
 
 def elipse(
