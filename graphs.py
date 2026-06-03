@@ -2411,3 +2411,259 @@ def radar(
         plt.show()
 
     return fig
+
+
+def magnetosphere(
+    R_m,
+    R_p=1.0,
+    x_range=None,
+    y_range=None,
+    grid_density=200,
+    wind_velocity=1.0,
+    title="Magnetospheric Standoff & Bow Shock",
+    x_label="Distance [$R_{planet}$]",
+    y_label="Distance [$R_{planet}$]",
+    background_color="white",
+    stream_color="#1f77b4",
+    stream_density=1.5,
+    stream_linewidth=1.2,
+    stream_arrowsize=1.5,
+    planet_color="black",
+    planet_edgecolor="white",
+    planet_linewidth=1.5,
+    shield_color="red",
+    shield_linestyle="--",
+    shield_linewidth=2.0,
+    shield_alpha=0.8,
+    safe_zone_color="blue",
+    safe_zone_alpha=0.1,
+    show_grid=True,
+    show_box=True,
+    remove_borders=False,
+    grid_color="#E6E6E6",
+    grid_alpha=0.7,
+    grid_linewidth=0.5,
+    grid_linestyle="--",
+    title_fontsize=16,
+    axis_fontsize=12,
+    title_pad=15,
+    label_pad=8,
+    fig_width=8,
+    fig_height=6,
+    figure_dpi=100,
+    top_right_ticks=True,
+    tick_direction="out",
+    save_fig=False,
+    dpi=300,
+    file_format="png",
+    filename="magnetosphere_graph",
+    show_plot=True,
+    theme=None,
+):
+    """
+    Gera um gráfico 2D do escoamento do vento estelar colidindo com a magnetosfera de um exoplaneta,
+    utilizando a solução geométrica do corpo de Rankine para as linhas de fluxo e a magnetopausa parabólica.
+
+    Args:
+        R_m (float): Raio de standoff da magnetopausa (distância do choque).
+        R_p (float, optional): Raio do planeta.
+        x_range (tuple, optional): Limites do eixo X.
+        y_range (tuple, optional): Limites do eixo Y.
+        grid_density (int, optional): Densidade da malha do campo vetorial.
+        wind_velocity (float, optional): Velocidade base do vento estelar.
+        title (str, optional): Título do gráfico.
+        x_label (str, optional): Rótulo do eixo X.
+        y_label (str, optional): Rótulo do eixo Y.
+        background_color (str, optional): Cor de fundo do gráfico.
+        stream_color (str, optional): Cor das linhas de fluxo de vento.
+        stream_density (float, optional): Densidade visual das linhas de fluxo.
+        stream_linewidth (float, optional): Espessura das linhas de fluxo.
+        stream_arrowsize (float, optional): Tamanho das setas indicativas do fluxo.
+        planet_color (str, optional): Cor de preenchimento do planeta central.
+        planet_edgecolor (str, optional): Cor da borda do planeta.
+        planet_linewidth (float, optional): Espessura da borda do planeta.
+        shield_color (str, optional): Cor da linha parabólica da magnetopausa.
+        shield_linestyle (str, optional): Estilo da linha da magnetopausa.
+        shield_linewidth (float, optional): Espessura da linha da magnetopausa.
+        shield_alpha (float, optional): Opacidade da linha da magnetopausa.
+        safe_zone_color (str, optional): Cor da zona protegida (interior da parábola).
+        safe_zone_alpha (float, optional): Opacidade da zona protegida.
+        show_grid (bool, optional): Ativa grade no gráfico.
+        show_box (bool, optional): Mantém a caixa em volta do gráfico.
+        remove_borders (bool, optional): Remove bordas superior e direita.
+        grid_color (str, optional): Cor da grade.
+        grid_alpha (float, optional): Opacidade da grade.
+        grid_linewidth (float, optional): Espessura da grade.
+        grid_linestyle (str, optional): Estilo de linha da grade.
+        title_fontsize (int, optional): Tamanho do título.
+        axis_fontsize (int, optional): Tamanho dos eixos.
+        title_pad (float, optional): Espaçamento do título.
+        label_pad (float, optional): Espaçamento dos rótulos.
+        fig_width (float, optional): Largura da figura.
+        fig_height (float, optional): Altura da figura.
+        figure_dpi (int, optional): Resolução de exibição da figura.
+        top_right_ticks (bool, optional): Marcações no canto superior e direito.
+        tick_direction (str, optional): Direção das marcações ('in' ou 'out').
+        save_fig (bool, optional): Salva em disco.
+        dpi (int, optional): Resolução do salvamento.
+        file_format (str, optional): Formato salvo.
+        filename (str, optional): Nome do arquivo salvo.
+        show_plot (bool, optional): Exibe a interface gráfica.
+        theme (str, optional): Tema do gráfico ('dark' ou None).
+
+    Returns:
+        Figure: Objeto de figura do Matplotlib contendo a simulação aerodinâmica.
+    """
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Circle
+
+    if theme == "dark":
+        text_color = "#ABB2BF"
+        edge_color = "#ABB2BF"
+        if background_color == "white":
+            background_color = "#242424"
+        if stream_color == "#1f77b4":
+            stream_color = "#61AFEF"
+        if shield_color == "red":
+            shield_color = "#E06C75"
+        if safe_zone_color == "blue":
+            safe_zone_color = "#98C379"
+        if planet_color == "black":
+            planet_color = "#1E1E1E"
+    else:
+        text_color = "black"
+        edge_color = "black"
+
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "mathtext.fontset": "dejavuserif",
+            "axes.linewidth": 1.2,
+            "xtick.direction": tick_direction,
+            "ytick.direction": tick_direction,
+            "xtick.top": top_right_ticks,
+            "ytick.right": top_right_ticks,
+            "xtick.labelsize": axis_fontsize - 2,
+            "ytick.labelsize": axis_fontsize - 2,
+            "text.color": text_color,
+            "axes.labelcolor": text_color,
+            "xtick.color": text_color,
+            "ytick.color": text_color,
+        }
+    )
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=figure_dpi)
+    fig.patch.set_facecolor(background_color)
+    ax.set_facecolor(background_color)
+
+    x_min = x_range[0] if x_range else -R_m * 2.5
+    x_max = x_range[1] if x_range else R_m * 3.5
+    y_min = y_range[0] if y_range else -R_m * 3.0
+    y_max = y_range[1] if y_range else R_m * 3.0
+
+    x = np.linspace(x_min, x_max, grid_density)
+    y = np.linspace(y_min, y_max, grid_density)
+    X, Y = np.meshgrid(x, y)
+
+    r_sq = X**2 + Y**2
+    r_sq[r_sq == 0] = 1e-10
+
+    U = wind_velocity * (1 + R_m * X / r_sq)
+    V = wind_velocity * (R_m * Y / r_sq)
+
+    parabola_x = (Y**2) / (4 * R_m) - R_m
+    inside = X >= parabola_x
+    U[inside] = np.nan
+    V[inside] = np.nan
+
+    ax.streamplot(
+        X,
+        Y,
+        U,
+        V,
+        color=stream_color,
+        density=stream_density,
+        linewidth=stream_linewidth,
+        arrowsize=stream_arrowsize,
+    )
+
+    y_line = np.linspace(y_min, y_max, 500)
+    x_line = (y_line**2) / (4 * R_m) - R_m
+    valid = (x_line >= x_min) & (x_line <= x_max)
+
+    ax.plot(
+        x_line[valid],
+        y_line[valid],
+        color=shield_color,
+        linestyle=shield_linestyle,
+        linewidth=shield_linewidth,
+        alpha=shield_alpha,
+        zorder=3,
+    )
+
+    ax.fill_betweenx(
+        y_line[valid],
+        x_line[valid],
+        x_max,
+        color=safe_zone_color,
+        alpha=safe_zone_alpha,
+        zorder=2,
+    )
+
+    planet = Circle(
+        (0, 0),
+        R_p,
+        color=planet_color,
+        ec=planet_edgecolor,
+        lw=planet_linewidth,
+        zorder=4,
+    )
+    ax.add_patch(planet)
+
+    if title:
+        ax.set_title(title, fontsize=title_fontsize, pad=title_pad, fontweight="bold")
+
+    ax.set_xlabel(x_label, fontsize=axis_fontsize, labelpad=label_pad)
+    ax.set_ylabel(y_label, fontsize=axis_fontsize, labelpad=label_pad)
+
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+
+    if show_grid:
+        ax.grid(
+            True,
+            linestyle=grid_linestyle,
+            linewidth=grid_linewidth,
+            color=grid_color,
+            alpha=grid_alpha,
+        )
+        ax.set_axisbelow(True)
+
+    if not show_box:
+        ax.set_frame_on(False)
+    elif remove_borders:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(True)
+        ax.spines["left"].set_visible(True)
+        ax.spines["bottom"].set_color(edge_color)
+        ax.spines["left"].set_color(edge_color)
+    else:
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color(edge_color)
+
+    plt.tight_layout()
+
+    if save_fig:
+        filepath = f"figures/{filename}.{file_format}"
+        import os
+
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor=background_color)
+
+    if show_plot:
+        plt.show()
+
+    return fig
