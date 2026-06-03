@@ -2159,3 +2159,257 @@ def elipse(
         plt.show()
 
     return fig, ax
+
+
+def radar(
+    r_data,
+    theta_data,
+    z_matrix=None,
+    rings_inner=None,
+    rings_outer=None,
+    rings_colors=None,
+    rings_alphas=None,
+    rings_labels=None,
+    scatter_r=None,
+    scatter_theta=None,
+    scatter_colors=None,
+    scatter_markers=None,
+    scatter_sizes=None,
+    scatter_labels=None,
+    title="",
+    r_label="",
+    z_label="",
+    r_scale="linear",
+    z_scale="log",
+    r_lim=None,
+    z_lim=None,
+    cmap="viridis",
+    show_grid=True,
+    background_color="white",
+    grid_color="#E6E6E6",
+    grid_alpha=0.7,
+    grid_linewidth=0.5,
+    grid_linestyle="--",
+    show_legend=True,
+    legend_title=None,
+    legend_box=False,
+    legend_fontsize=None,
+    legend_loc="upper right",
+    title_fontsize=16,
+    axis_fontsize=12,
+    title_pad=15,
+    label_pad=8,
+    fig_width=7,
+    fig_height=7,
+    figure_dpi=100,
+    save_fig=False,
+    dpi=100,
+    file_format="png",
+    filename="plot_radar",
+    show_plot=True,
+    theme=None,
+):
+    """
+    Gera um mapa de radar 2D polar com personalização completa, ideal para visualizar
+    a distribuição espacial de grandezas físicas (ex: zonas orbitais, Zonas Habitáveis...).
+
+    Args:
+        r_data (array-like): Matriz ou vetor do eixo radial.
+        theta_data (array-like): Matriz ou vetor do eixo angular.
+        z_matrix (array-like, optional): Matriz 2D representando a grandeza de fundo (heatmap).
+        rings_inner (float/list, optional): Raios internos dos anéis (ex: Zona Habitável).
+        rings_outer (float/list, optional): Raios externos dos anéis.
+        rings_colors (str/list, optional): Cores de preenchimento dos anéis.
+        rings_alphas (float/list, optional): Opacidade dos anéis.
+        rings_labels (str/list, optional): Rótulos dos anéis.
+        scatter_r (array-like/list, optional): Coordenadas radiais para pontos espaciais (ex: planetas).
+        scatter_theta (array-like/list, optional): Coordenadas angulares para pontos espaciais.
+        scatter_colors (str/list, optional): Cores dos pontos.
+        scatter_markers (str/list, optional): Marcadores dos pontos.
+        scatter_sizes (float/list, optional): Tamanhos dos pontos.
+        scatter_labels (str/list, optional): Rótulos dos pontos.
+        title (str, optional): Título principal.
+        r_label (str, optional): Rótulo do eixo radial.
+        z_label (str, optional): Rótulo da barra de cores (z_matrix).
+        r_scale (str, optional): Escala do eixo radial ('linear', 'symlog').
+        z_scale (str, optional): Escala de normalização do heatmap ('linear', 'log').
+        r_lim (tuple, optional): Limites do eixo radial.
+        z_lim (tuple, optional): Limites numéricos para a barra de cores (vmin, vmax).
+        cmap (str, optional): Mapa de cores para o z_matrix.
+        show_grid (bool, optional): Ativa grade polar.
+        background_color (str, optional): Cor de fundo.
+        grid_color (str, optional): Cor da grade polar.
+        grid_alpha (float, optional): Opacidade da grade.
+        grid_linewidth (float, optional): Espessura da grade.
+        grid_linestyle (str, optional): Estilo de linha da grade.
+        show_legend (bool, optional): Ativa a legenda principal.
+        legend_title (str, optional): Título da legenda.
+        legend_box (bool, optional): Borda da legenda.
+        legend_fontsize (float, optional): Tamanho da fonte da legenda.
+        legend_loc (str/tuple, optional): Posição da legenda.
+        title_fontsize (int, optional): Tamanho do título.
+        axis_fontsize (int, optional): Tamanho da fonte dos rótulos e eixos.
+        title_pad (float, optional): Espaçamento do título.
+        label_pad (float, optional): Espaçamento do rótulo da barra de cores.
+        fig_width (float, optional): Largura da figura.
+        fig_height (float, optional): Altura da figura.
+        figure_dpi (int, optional): Resolução em tela.
+        save_fig (bool, optional): Salva em disco.
+        dpi (int, optional): Resolução de exportação.
+        file_format (str, optional): Formato do arquivo exportado.
+        filename (str, optional): Nome do arquivo.
+        show_plot (bool, optional): Exibe a interface gráfica nativa.
+        theme (str, optional): Aplica tema de cores ('dark' ou None).
+
+    Returns:
+        Figure: Objeto de figura do Matplotlib.
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+    import numpy as np
+
+    if theme == "dark":
+        text_color = "#ABB2BF"
+        edge_color = "#ABB2BF"
+        if background_color == "white":
+            background_color = "#242424"
+    else:
+        text_color = "black"
+        edge_color = "black"
+
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "mathtext.fontset": "dejavuserif",
+            "axes.linewidth": 1.2,
+            "text.color": text_color,
+            "axes.labelcolor": text_color,
+            "xtick.color": text_color,
+            "ytick.color": text_color,
+        }
+    )
+
+    fig, ax = plt.subplots(
+        figsize=(fig_width, fig_height),
+        dpi=figure_dpi,
+        subplot_kw={"projection": "polar"},
+    )
+    fig.patch.set_facecolor(background_color)
+    ax.set_facecolor(background_color)
+
+    if z_matrix is not None:
+        vmin = z_lim[0] if z_lim else None
+        vmax = z_lim[1] if z_lim else None
+        if z_scale == "log":
+            norm = mcolors.LogNorm(vmin=vmin, vmax=vmax)
+        else:
+            norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
+
+        mesh = ax.pcolormesh(
+            theta_data, r_data, z_matrix, cmap=cmap, norm=norm, shading="auto"
+        )
+
+        if z_label:
+            cbar = fig.colorbar(mesh, ax=ax, pad=0.1, fraction=0.046)
+            cbar.set_label(z_label, fontsize=axis_fontsize, labelpad=label_pad)
+            cbar.ax.yaxis.set_tick_params(color=text_color)
+            plt.setp(plt.getp(cbar.ax.axes, "yticklabels"), color=text_color)
+
+    if rings_inner is not None and rings_outer is not None:
+        r_in_list = rings_inner if isinstance(rings_inner, list) else [rings_inner]
+        r_out_list = rings_outer if isinstance(rings_outer, list) else [rings_outer]
+        r_col_list = rings_colors if isinstance(rings_colors, list) else [rings_colors]
+        r_alp_list = rings_alphas if isinstance(rings_alphas, list) else [rings_alphas]
+        r_lab_list = rings_labels if isinstance(rings_labels, list) else [rings_labels]
+
+        theta_fill = np.linspace(0, 2 * np.pi, 200)
+        for i in range(len(r_in_list)):
+            r_in = r_in_list[i]
+            r_out = r_out_list[i]
+            c = r_col_list[i % len(r_col_list)]
+            a = r_alp_list[i % len(r_alp_list)]
+            l = r_lab_list[i % len(r_lab_list)] if r_lab_list else None
+            ax.fill_between(
+                theta_fill, r_in, r_out, color=c, alpha=a, label=l, zorder=2
+            )
+
+    if scatter_r is not None and scatter_theta is not None:
+        sr_list = scatter_r if isinstance(scatter_r, list) else [scatter_r]
+        st_list = scatter_theta if isinstance(scatter_theta, list) else [scatter_theta]
+        sc_list = (
+            scatter_colors if isinstance(scatter_colors, list) else [scatter_colors]
+        )
+        sm_list = (
+            scatter_markers if isinstance(scatter_markers, list) else [scatter_markers]
+        )
+        sz_list = scatter_sizes if isinstance(scatter_sizes, list) else [scatter_sizes]
+        sl_list = (
+            scatter_labels if isinstance(scatter_labels, list) else [scatter_labels]
+        )
+
+        for i in range(len(sr_list)):
+            c = sc_list[i % len(sc_list)]
+            m = sm_list[i % len(sm_list)]
+            s = sz_list[i % len(sz_list)]
+            l = sl_list[i % len(sl_list)] if sl_list else None
+            ax.scatter(
+                st_list[i], sr_list[i], color=c, marker=m, s=s, label=l, zorder=4
+            )
+
+    if title:
+        ax.set_title(title, fontsize=title_fontsize, pad=title_pad, fontweight="bold")
+
+    ax.set_rlabel_position(45)
+    ax.tick_params(axis="y", labelsize=axis_fontsize - 2, colors=text_color)
+    ax.tick_params(axis="x", labelsize=axis_fontsize - 2, colors=text_color)
+
+    if r_label:
+        ax.set_ylabel(r_label, fontsize=axis_fontsize, color=text_color, labelpad=35)
+
+    if r_scale == "log":
+        ax.set_rscale("symlog")
+
+    if r_lim is not None:
+        ax.set_ylim(r_lim)
+
+    if show_grid:
+        ax.grid(
+            True,
+            linestyle=grid_linestyle,
+            linewidth=grid_linewidth,
+            color=grid_color,
+            alpha=grid_alpha,
+        )
+        ax.set_axisbelow(True)
+
+    if show_legend:
+        handles, labels = ax.get_legend_handles_labels()
+        if labels:
+            final_legend_fontsize = (
+                legend_fontsize if legend_fontsize else axis_fontsize * 0.9
+            )
+            ax.legend(
+                title=legend_title,
+                frameon=legend_box,
+                fontsize=final_legend_fontsize,
+                title_fontsize=axis_fontsize,
+                loc=legend_loc,
+                edgecolor=edge_color if legend_box else None,
+                bbox_to_anchor=(1.2, 1.1),
+            )
+
+    plt.tight_layout()
+
+    if save_fig:
+        filepath = f"figures/{filename}.{file_format}"
+        import os
+
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        plt.savefig(filepath, dpi=dpi, bbox_inches="tight", facecolor=background_color)
+
+    if show_plot:
+        plt.show()
+
+    return fig
+
+
