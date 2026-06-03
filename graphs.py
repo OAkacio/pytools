@@ -2411,5 +2411,3 @@ def radar(
         plt.show()
 
     return fig
-
-
